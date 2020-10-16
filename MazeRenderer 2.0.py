@@ -56,6 +56,7 @@ def progress_bar(width,number_of_segements,progress,screen,offset,window_dimensi
     draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
 
 def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args):
+    #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
     width = alter_to_fit_scale(width)
     height = alter_to_fit_scale(height)
     for i in range(0,len(startpos)):
