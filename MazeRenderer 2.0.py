@@ -1,16 +1,15 @@
 import time
-import pygame
-from pygame import gfxdraw
+import pygame               #Used to draw pixels on the screen in a window
 
 #colours
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 255, 0)
 red = (255, 0, 0)
-default = black
+default = black             #Equivalent to background colour
 
 #other
-scale = 1 #Has to be an int
+scale = 2 #Has to be an int
 debug = False
 
 def play_maze(width,height,title,maze_data):
@@ -70,11 +69,12 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
                 screen.set_at((x,y),default)
 
 def alter_to_fit_scale(value):
+    #Alters any variable to fit game scale
     return (value*scale)
 
 def alter_coords_to_fit_scale(value,full):
-    value = full + value
-    return (value*scale)
+    #Makes coords relative to the center and fits them to game scale
+    return (full + (value*scale))
 
 def draw_maze(width,height,screen):
     #This function will draw the maze based on maze data generated in the maze generation scripts (currently no data can be passed as the maze generation scripts need to be rewritten)
