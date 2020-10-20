@@ -3,6 +3,7 @@ import os                   #Used to hide the initial pygame console output
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame               #Used to draw pixels on the screen in a window
 
+#VARIABLES
 #colours
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -15,6 +16,7 @@ default_line_weight = 1
 scale = 1 #Has to be an int
 debug = False
 
+#GAME LOGIC
 def play_maze(width,height,title,maze_data):
     pygame.init()
     screen = pygame.display.set_mode((width,height))
@@ -60,10 +62,10 @@ def play_maze(width,height,title,maze_data):
                     from MazeGenerationNew import generate_random_walls
                     maze_data = generate_random_walls(100,100)
                 #Checks to make sure player can't go outside the maze
-                if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data)-1:
+                if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0]):
                     add_to_x = 0
                     check_walls = False
-                if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data[0])-1:
+                if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data):
                     add_to_y = 0
                     check_walls = False
                 #Checks to see if there is a wall in the players way
@@ -79,24 +81,33 @@ def play_maze(width,height,title,maze_data):
         if debug:
             print(str(round((time.time() - start_time)*1000,1)) + "ms") #Prints execution time (per frame) to console
             print(temp)
-        if loading == True:
+        if loading:
             if temp >= 1:
                 loading = False
                 screen.fill(default)
             else:
                 progress_bar(100,4,temp,screen,[0,0],[width,height]) #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
                 temp += 1 * delta_time                               #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
-        elif loading == False:                                       #the progress bar would have to be called from the MazeGenerationNew script) #len(maze_data[0])-2
+        elif not loading:                                            #the progress bar would have to be called from the MazeGenerationNew script)
             if first_frame == True:                
                 first_frame = False
                 generated_data = draw_maze([width,height],cube_size,screen,maze_data)
-                player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[0,0],True)
+                player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[0,len(maze_data)-1],True)
                 position_set_to = player_pos
             else:
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
+                if won(player_pos,[len(maze_data[0])-1,0]):
+                    running = False #Currently this just closes the program but at some point it should display a maze sloved message on screen
         pygame.display.flip()                                                                                                                                                                
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
     pygame.quit()
+
+#CHECKS
+def won(player_pos,win_pos):
+    if player_pos == win_pos:
+        return True
+    else:
+        return False
 
 def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if there is a wall blocking the players way (currently not working)
     if move_dir == "":
@@ -112,6 +123,7 @@ def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if th
     else:
         return False
 
+#RENDERING
 def draw_maze(window_dimensions,cube_size,screen,maze_data):
     #This function will draw the maze based on maze data generated in the maze generation script
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
@@ -128,7 +140,7 @@ def draw_maze(window_dimensions,cube_size,screen,maze_data):
         offsety += cube_size-1
         offsetx = 0
     #Maze Shell#
-    #draw_rectangle([(0-maze_height/2),(0-maze_width/2)],((cube_size-1)*len(maze_data[0])),((cube_size-1)*len(maze_data)),False,white,screen,window_dimensions,[1,1,1,1]) #Currently the size of the maze shell is drawn wrong so it is disabled
+    draw_rectangle([(0-maze_height/2),(0-maze_width/2)],maze_height,maze_width,False,white,screen,window_dimensions,[1,1,1,1])
     return [maze_width,maze_height,]
 
 def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args):
@@ -145,13 +157,6 @@ def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensi
             draw_rectangle(old_player_pos,player_size,player_size,True,black,screen,window_dimensions) #Remove previous player_pos   
             draw_rectangle(player_pos,player_size,player_size,True,green,screen,window_dimensions)                   
     return new_pos
-
-def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts map coords to pixel measurments so that the player can be properly positioned 
-    x = pos[0]                                                   #Currently while the player isn't intersecting walls they don't look like they are in the center 
-    y = pos[1]
-    pos_in_pixels = [(0-(maze_width/2)+(cube_size-1)*x)+(0.2*cube_size),(0-(maze_height/2)+(cube_size-1)*y)+(0.2*cube_size)]
-    #print(pos_in_pixels)   
-    return pos_in_pixels
 
 def progress_bar(width,number_of_segements,progress,screen,offset,window_dimensions):
     center = [0+offset[0],0+offset[0]]
@@ -183,6 +188,14 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
                     pass
                 else:
                     screen.set_at((x,y),colour)
+
+#CONVERTORS
+def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts map coords to pixel measurments so that the player can be properly positioned 
+    x = pos[0]                                                   #Currently while the player isn't intersecting walls they don't look like they are in the center 
+    y = pos[1]
+    pos_in_pixels = [(0-(maze_width/2)+(cube_size-1)*x)+(0.2*cube_size),(0-(maze_height/2)+(cube_size-1)*y)+(0.2*cube_size)]
+    #print(pos_in_pixels)   
+    return pos_in_pixels
 
 def alter_to_fit_scale(value):
     #Alters any variable to fit game scale

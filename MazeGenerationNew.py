@@ -8,10 +8,11 @@ wall = 1
 def generate_random_walls(height,width):
     #Intialize the array
     maze_array = []
+    temp_list = [0,0,0,0,0,0,1]
     for x in range(0,width):
         maze_array.append([])
         for y in range(0,height):
-            maze_array[x].append([random.randint(0,1),random.randint(0,1),random.randint(0,1),random.randint(0,1)])
+            maze_array[x].append([random.choice(temp_list),random.choice(temp_list),random.choice(temp_list),random.choice(temp_list)])
     return maze_array
 
 def generate_walled_maze(width,height):
