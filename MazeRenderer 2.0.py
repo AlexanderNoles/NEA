@@ -1,5 +1,5 @@
 import time     
-import os                   #Used to hide the initial pygame prompt
+import os                   #Used to hide the initial pygame console output
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame               #Used to draw pixels on the screen in a window
 
@@ -21,16 +21,59 @@ def play_maze(width,height,title,maze_data):
     pygame.display.set_caption(title)
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
+    add_to_y = 0
+    add_to_x = 0
     loading = True
     first_frame = True
     running = True
+    position_set_to = [0,0]
+    move_dir = ""
+    player_pos = [0,0]
+    cube_size = 10
+    check_walls = True
     while running:
-        start_time = time.time() #For measuring execution time, for debug and for testing program speed    
-        #Anything in this loop is run every frame while running is True
+        #Anything in this loop is run every frame (Equivalent to Unity's update() function)
+        start_time = time.time() #For measuring execution time it is used for debug, testing program speed and the calculation of delta_time  
         for event in pygame.event.get():            
             #Makes program stop when user closes the window
             if event.type == pygame.QUIT:
                 running = False
+            #Checks if the player has pressed a move button (and which one it was) this frame
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    add_to_x = -1
+                    move_dir = "left"
+                elif event.key == pygame.K_RIGHT:
+                    add_to_x = 1
+                    move_dir = "right"
+                elif event.key == pygame.K_UP:
+                    add_to_y = -1
+                    move_dir = "up"
+                elif event.key == pygame.K_DOWN:
+                    add_to_y = 1
+                    move_dir = "down"
+                else:
+                    move_dir = ""
+                #Need to make it check to see if input is valid
+                print('')
+                print(player_pos[0],player_pos[1])
+                print(position_set_to[0] + add_to_x, position_set_to[1] + add_to_y)
+                #Checks to make sure player can't go outside the maze
+                if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data)-1:
+                    add_to_x = 0
+                    check_walls = False
+                if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data[0])-1:
+                    add_to_y = 0
+                    check_walls = False
+                #Checks to see if there is a wall in the players way
+                if(wall(maze_data,[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],player_pos,move_dir)) and check_walls:
+                    add_to_y = 0
+                    add_to_x = 0
+                check_walls = True
+            else:
+                position_set_to = player_pos
+                add_to_y = 0
+                add_to_x = 0
         #Game Code
         if debug:
             print(str(round((time.time() - start_time)*1000,1)) + "ms") #Prints execution time (per frame) to console
@@ -40,15 +83,78 @@ def play_maze(width,height,title,maze_data):
                 loading = False
                 screen.fill(default)
             else:
-                progress_bar(100,4,temp,screen,[0,0],[width,height]) #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the actual loading progression
-                temp += 1 * delta_time
-        elif loading == False:
+                progress_bar(100,4,temp,screen,[0,0],[width,height]) #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
+                temp += 1 * delta_time                               #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
+        elif loading == False:                                       #the progress bar would have to be called from the MazeGenerationNew script) #len(maze_data[0])-2
             if first_frame == True:
                 first_frame = False
-                draw_maze([width,height],10,screen,maze_data)
-        pygame.display.flip()
+                generated_data = draw_maze([width,height],cube_size,screen,maze_data)
+                player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[0,0],True)
+                position_set_to = player_pos
+            else:
+                player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
+        pygame.display.flip()                                                                                                                                                                
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
     pygame.quit()
+
+def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if there is a wall blocking the players way (currently not working)
+    if move_dir == "":
+        return True
+    dict_one = {
+        "left":[0,1],
+        "right":[1,0],
+        "up":[2,3],
+        "down":[3,2]
+        }
+    print((maze_data[-player_pos[0]][-player_pos[1]]))
+    print((maze_data[-player_pos[0]][-player_pos[1]])[(dict_one[move_dir])[0]])
+    if (maze_data[-player_pos[0]][-player_pos[1]])[(dict_one[move_dir])[0]] == 1 and (maze_data[-player_pos[0]][-player_pos[1]])[(dict_one[move_dir])[0]] == 1:
+        print("wall")
+        return True
+    else:
+        print("no wall")
+        return False
+
+def draw_maze(window_dimensions,cube_size,screen,maze_data):    
+    #This function will draw the maze based on maze data generated in the maze generation script
+    #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
+    if cube_size < 3: cube_size = 3 
+    #Content of maze#
+    maze_width = (len(maze_data) * (cube_size-1))+1 #Calculates the dimensions of the maze, taking into account the fact the squares overlap
+    maze_height = (len(maze_data[0]) * (cube_size-1))+1    
+    offsety = 0
+    offsetx = 0
+    for y in range(0,len(maze_data)):
+        for x in range(0, len(maze_data[y])):
+            draw_rectangle([int(0-(maze_height/2)+offsetx),int((0-maze_width/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[y][x])
+            offsetx += cube_size-1       
+        offsety += cube_size-1  
+        offsetx = 0
+    #Maze Shell#
+    #draw_outline([int(0-maze_height/2),int(0-maze_width/2)],((cube_size-1)*len(maze_data[0])),((cube_size-1)*len(maze_data)),white,screen,window_dimensions,[1,1,1,1])
+    return [maze_width,maze_height,]
+
+def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args):
+    player_size = cube_size * 0.6
+    if first_pos:
+        player_pos = find_center_of_square(maze_width,maze_height,cube_size,new_pos)
+        draw_rectangle(player_pos,player_size,player_size,True,green,screen,window_dimensions)
+    else:
+        if args[0] is None:
+            print("ERROR: No previous position entered")
+        else:
+            old_player_pos = find_center_of_square(maze_width,maze_height,cube_size,args[0])
+            player_pos = find_center_of_square(maze_width,maze_height,cube_size,new_pos)
+            draw_rectangle(old_player_pos,player_size,player_size,True,black,screen,window_dimensions) #Remove previous player_pos   
+            draw_rectangle(player_pos,player_size,player_size,True,green,screen,window_dimensions)                   
+    return new_pos
+
+def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts map coords to pixel measurments so that the player can be properly positioned 
+    x = pos[0]                                                   #Currently while the player isn't intersecting walls they don't look like they are in the center 
+    y = pos[1]
+    pos_in_pixels = [int(0-(maze_width/2)+(cube_size-1)*x)+(0.2*cube_size),int(0-(maze_height/2)+(cube_size-1)*y)+(0.2*cube_size)]
+    #print(pos_in_pixels)   
+    return pos_in_pixels
 
 def progress_bar(width,number_of_segements,progress,screen,offset,window_dimensions):
     center = [0+offset[0],0+offset[0]]
@@ -91,28 +197,12 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
 
 def alter_to_fit_scale(value):
     #Alters any variable to fit game scale
-    return (value*scale)
+    return int(value*scale)
 
 def alter_coords_to_fit_scale(value,full):
     #Makes coords relative to the center and fits them to game scale
-    return (full + (value*scale))
-
-def draw_maze(window_dimensions,cube_size,screen,maze_data):
-    #This function will draw the maze based on maze data generated in the maze generation script
-    #Content of maze#
-    maze_width = len(maze_data) * (cube_size / 1.1) #Divided by 1.1 to shift maze into proper place when cubes slightly overlap each other (represented by the offsets being cube_size-1)
-    maze_height = len(maze_data[0]) * (cube_size / 1.1)    
-    offsety = 0
-    offsetx = 0
-    for x in range(0,len(maze_data)):
-        for y in range(0, len(maze_data[x])):
-            draw_rectangle([int(0-(maze_height/2)+offsetx),int((-maze_width/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[x][y])
-            offsetx += cube_size-1         
-        offsety += cube_size-1  
-        offsetx = 0
-    #Maze Shell#
-    draw_outline([int(0-maze_height/2),int(0-maze_width/2)],((cube_size-1)*len(maze_data[0])),((cube_size-1)*len(maze_data)),white,screen,window_dimensions,[1,1,1,1])
+    return int(full + (value*scale))
 
 from MazeGenerationNew import generate_random_walls
 maze_data = generate_random_walls(100,100)
-play_maze(1000,1000,"Test Maze",maze_data)
+play_maze(1500,1000,"Test Maze",maze_data)

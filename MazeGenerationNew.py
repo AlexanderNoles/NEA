@@ -5,7 +5,7 @@ import random
 empty = 0
 wall = 1
 
-def generate_random_walls(width,height):
+def generate_random_walls(height,width):
     #Intialize the array
     maze_array = []
     for x in range(0,width):
