@@ -176,6 +176,8 @@ def text(startpos,text,text_size,colour,screen,window_dimensions):
         "u":20,"v":21,"w":22,"x":23,"y":24,
         "z":25
         }
+    #Works in a simialr way to draw_maze (essentially a bunch of white cubes placed next to each other using offsetx and offsety)
+    #wanted to keep them separate as there is large differences in how the placement of cubes in encoded
     pass
 
 def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
