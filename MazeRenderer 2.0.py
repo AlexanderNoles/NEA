@@ -60,9 +60,9 @@ def play_maze(width,height,title,maze_data):
                     first_frame = True
                     screen.fill(default)
                     from MazeGenerationNew import generate_random_walls
-                    maze_data = generate_random_walls(100,100)
+                    maze_data = generate_random_walls(10,10)
                 #Checks to make sure player can't go outside the maze
-                if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0]):
+                if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0])-1:
                     add_to_x = 0
                     check_walls = False
                 if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data):
@@ -86,18 +86,21 @@ def play_maze(width,height,title,maze_data):
                 loading = False
                 screen.fill(default)
             else:
-                progress_bar(100,4,temp,screen,[0,0],[width,height]) #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
-                temp += 1 * delta_time                               #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
-        elif not loading:                                            #the progress bar would have to be called from the MazeGenerationNew script)
+                progress_bar(width/4,temp,screen,[0,0],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
+                temp += 1 * delta_time                                  #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
+        elif not loading:                                               #the progress bar would have to be called from the MazeGenerationNew script)
             if first_frame == True:                
                 first_frame = False
                 generated_data = draw_maze([width,height],cube_size,screen,maze_data)
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[0,len(maze_data)-1],True)
                 position_set_to = player_pos
             else:
-                player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
-                if won(player_pos,[len(maze_data[0])-1,0]):
-                    running = False #Currently this just closes the program but at some point it should display a maze sloved message on screen
+                if won(player_pos,[len(maze_data[0])-1,0]):                    
+                    screen.fill(default)
+                    print("YouWon")
+                    running = False
+                else:
+                    player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
         pygame.display.flip()                                                                                                                                                                
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
     pygame.quit()
@@ -157,12 +160,23 @@ def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensi
             draw_rectangle(player_pos,player_size,player_size,True,green,screen,window_dimensions)                   
     return new_pos
 
-def progress_bar(width,number_of_segements,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
+def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
     center = [0+offset[0],0+offset[0]]
     #Draw progress bar shell
     draw_rectangle([int(center[0]-width/2),center[1]],width,15,False,white,screen,window_dimensions,1)
     #Draw actual progress
     draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
+
+def text(startpos,text,text_size,colour,screen,window_dimensions):
+    text_dict = {
+        "a":0,"b":1,"c":2,"d":3,"e":4,
+        "f":5,"g":6,"h":7,"i":8,"j":9,
+        "k":10,"l":11,"m":12,"n":13,"o":14,
+        "p":15,"q":16,"r":17,"s":18,"t":19,
+        "u":20,"v":21,"w":22,"x":23,"y":24,
+        "z":25
+        }
+    pass
 
 def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
     width = alter_to_fit_scale(width)
@@ -201,5 +215,5 @@ def alter_coords_to_fit_scale(value,full): #Makes coords relative to the center 
     return int(full + (value*scale))
 
 from MazeGenerationNew import generate_random_walls
-maze_data = generate_random_walls(100,100)
+maze_data = generate_random_walls(10,10)
 play_maze(1500,1000,"Test Maze",maze_data)
