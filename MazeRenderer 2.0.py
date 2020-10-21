@@ -103,7 +103,7 @@ def play_maze(width,height,title,maze_data):
     pygame.quit()
 
 #CHECKS
-def won(player_pos,win_pos):
+def won(player_pos,win_pos): #Compares player position to entered position
     if player_pos == win_pos:
         return True
     else:
@@ -124,8 +124,7 @@ def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if th
         return False
 
 #RENDERING
-def draw_maze(window_dimensions,cube_size,screen,maze_data):
-    #This function will draw the maze based on maze data generated in the maze generation script
+def draw_maze(window_dimensions,cube_size,screen,maze_data): #This function will draw a maze based on maze data generated in the maze generation script
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
     if cube_size < 3: cube_size = 3 
     #Content of maze#
@@ -143,7 +142,7 @@ def draw_maze(window_dimensions,cube_size,screen,maze_data):
     draw_rectangle([(0-maze_height/2),(0-maze_width/2)],maze_height,maze_width,False,white,screen,window_dimensions,[1,1,1,1])
     return [maze_width,maze_height,]
 
-def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args):
+def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args): #Draws the player in the center of a square, indicated by x and y coordinates
     player_size = cube_size * 0.6
     if first_pos:
         player_pos = find_center_of_square(maze_width,maze_height,cube_size,new_pos)
@@ -158,15 +157,14 @@ def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensi
             draw_rectangle(player_pos,player_size,player_size,True,green,screen,window_dimensions)                   
     return new_pos
 
-def progress_bar(width,number_of_segements,progress,screen,offset,window_dimensions):
+def progress_bar(width,number_of_segements,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
     center = [0+offset[0],0+offset[0]]
     #Draw progress bar shell
     draw_rectangle([int(center[0]-width/2),center[1]],width,15,False,white,screen,window_dimensions,1)
     #Draw actual progress
     draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
 
-def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args):
-    #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
+def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
     width = alter_to_fit_scale(width)
     height = alter_to_fit_scale(height)
     for i in range(0,len(startpos)):
@@ -190,19 +188,16 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
                     screen.set_at((x,y),colour)
 
 #CONVERTORS
-def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts map coords to pixel measurments so that the player can be properly positioned 
-    x = pos[0]                                                   #Currently while the player isn't intersecting walls they don't look like they are in the center 
+def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts x and y coords to pixel measurments so that the player can be properly positioned 
+    x = pos[0]                                                   
     y = pos[1]
     pos_in_pixels = [(0-(maze_width/2)+(cube_size-1)*x)+(0.2*cube_size),(0-(maze_height/2)+(cube_size-1)*y)+(0.2*cube_size)]
-    #print(pos_in_pixels)   
     return pos_in_pixels
 
-def alter_to_fit_scale(value):
-    #Alters any variable to fit game scale
+def alter_to_fit_scale(value): #Alters any variable to fit game scale    
     return int(value*scale)
 
-def alter_coords_to_fit_scale(value,full):
-    #Makes coords relative to the center and fits them to game scale
+def alter_coords_to_fit_scale(value,full): #Makes coords relative to the center and fits them to game scale   
     return int(full + (value*scale))
 
 from MazeGenerationNew import generate_random_walls

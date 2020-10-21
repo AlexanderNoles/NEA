@@ -1,2 +1,0 @@
-making circular maze algorthim
-non-circular works pretty well
