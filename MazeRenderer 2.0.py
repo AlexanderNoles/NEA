@@ -15,6 +15,9 @@ default = black             #Equivalent to background colour
 default_line_weight = 1
 scale = 1 #Has to be an int
 debug = False
+with open('font.txt') as f:
+    font = f.readlines()
+    f.close()
 
 #GAME LOGIC
 def play_maze(width,height,title,maze_data):
@@ -92,13 +95,13 @@ def play_maze(width,height,title,maze_data):
             if first_frame == True:                
                 first_frame = False
                 generated_data = draw_maze([width,height],cube_size,screen,maze_data)
+                text(title,3,[0,(((len(maze_data) * (cube_size-1))+1)/2)+15],white,screen,[width,height])
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[0,len(maze_data)-1],True)
                 position_set_to = player_pos
             else:
                 if won(player_pos,[len(maze_data[0])-1,0]):                    
                     screen.fill(default)
-                    print("YouWon")
-                    running = False
+                    text("Maze Completed",5,[0,0],white,screen,[width,height])
                 else:
                     player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
         pygame.display.flip()                                                                                                                                                                
@@ -167,19 +170,39 @@ def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a p
     #Draw actual progress
     draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
 
-def text(startpos,text,text_size,colour,screen,window_dimensions):
+def text(text,text_size,offset,colour,screen,window_dimensions): #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
     text_dict = {
-        "a":0,"b":1,"c":2,"d":3,"e":4,
-        "f":5,"g":6,"h":7,"i":8,"j":9,
-        "k":10,"l":11,"m":12,"n":13,"o":14,
-        "p":15,"q":16,"r":17,"s":18,"t":19,
-        "u":20,"v":21,"w":22,"x":23,"y":24,
-        "z":25
+        "a":0,"A":0,"b":1,"B":1,"c":2,"C":2,"d":3,"D":3,"e":4,"E":4,
+        "f":5,"F":5,"g":6,"G":6,"h":7,"H":7,"i":8,"I":8,"j":9,"J":9,
+        "k":10,"K":10,"l":11,"L":11,"m":12,"M":12,"n":13,"N":13,"o":14,"O":14,
+        "p":15,"P":15,"q":16,"Q":16,"r":17,"R":17,"s":18,"S":18,"t":19,"T":19,
+        "u":20,"U":20,"v":21,"V":21,"w":22,"W":22,"x":23,"X":23,"y":24,"Y":24,
+        "z":25,"Z":25," ":26,"1":27,"2":28,"3":29,"4":30,"5":31,"6":32,"7":33,
+        "8":34,"9":35,"0":36
         }
-    #Works in a simialr way to draw_maze (essentially a bunch of white cubes placed next to each other using offsetx and offsety)
-    #wanted to keep them separate as there is large differences in how the placement of cubes in encoded
-    pass
-
+    text_list = split(text)
+    text_width = 0
+    text_height = 5 * text_size
+    offsetx = 0
+    offsety = 0
+    offset_character = 0
+    for i in text_list:
+        character_data = split_int(font[text_dict[i]])
+        text_width += (int((len(character_data)*text_size)/5) + (1*text_size))
+    for i in text_list:
+        character_data = split_int(font[text_dict[i]])
+        for y in range(0,5):
+            for x in range(0,int(len(character_data)/5)):
+                if character_data[(y*int(len(character_data)/5))+x] == 0:
+                    pass
+                else:
+                    draw_rectangle([(-text_width/2)+offsetx+offset_character+(offset[0]*-1),(-text_height/2)+offsety+(offset[1]*-1)],text_size,text_size,True,colour,screen,window_dimensions)
+                offsetx += text_size
+            offsety += text_size
+            offsetx = 0
+        offset_character += (text_size * (len(character_data)/5))+(1 * text_size)
+        offsety = 0
+        
 def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
     width = alter_to_fit_scale(width)
     height = alter_to_fit_scale(height)
@@ -216,6 +239,15 @@ def alter_to_fit_scale(value): #Alters any variable to fit game scale
 def alter_coords_to_fit_scale(value,full): #Makes coords relative to the center and fits them to game scale   
     return int(full + (value*scale))
 
+#OTHER
+def split(word):
+    return [char for char in word]
+
+def split_int(word):
+    word = word.replace(" ","")
+    word = word.replace("\n","")
+    return [int(char) for char in word]
+
 from MazeGenerationNew import generate_random_walls
-maze_data = generate_random_walls(10,10)
-play_maze(1500,1000,"Test Maze",maze_data)
+maze_data = generate_random_walls(100,100)
+play_maze(1500,1000,"100 x 100",maze_data)
