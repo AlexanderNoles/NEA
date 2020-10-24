@@ -21,8 +21,8 @@ def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Al
     for x in range(0,width):
         maze_array.append([])
         for y in range(0,height):
-            maze_array[x].append([1,1,1,1]) #Add a blank cell with all four walls
-    weight_group_array = []
+            maze_array[x].append([1,1,1,1]) #Add a blank cell with all four walls to create an array that will be altered to generate a maze
+    weight_group_array = []                 #This array is the data we return
     for x in range(0,width):
         weight_group_array.append([])
         for y in range(0,height):
