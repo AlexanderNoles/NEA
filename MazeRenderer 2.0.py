@@ -253,9 +253,8 @@ def split_int(word):
 def pythag(a,b):
     return ((a*a)+(b*b))**0.5
 
-maze_width = 3
-maze_height = 3
+maze_width = 10
+maze_height = 10
 from MazeGenerationNew import generate_walled_maze
 maze_data = generate_walled_maze(maze_height,maze_width,100)
-#maze_data = generate_random_walls(maze_height,maze_width)
 play_maze(1500,1000,(str(maze_height) + " x " + str(maze_width)),maze_data)

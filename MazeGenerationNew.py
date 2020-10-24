@@ -32,31 +32,23 @@ def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Al
     n = 1
     while not all_in_one_group(weight_group_array,height,width) or not temp_list_empty:
         temp_list = lowest_values_pos(weight_group_array,width,height,max_weight+1)
-        #for x in range(0,width):
-            #for y in range(0,height):             
-                #for i in range(0,4):
-                    #if [x,y,i] in temp_list:
-                        #(weight_group_array[x][y])[i] = max_weight+2
         if temp_list == []:
             temp_list_empty = True
         else:
             dict_one = {
-                0:[-1,0,1],
-                1:[1,0,0],
-                2:[0,1,3],
-                3:[0,-1,2]
+                0:[0,-1,1],
+                1:[0,1,0],
+                2:[-1,0,3],
+                3:[1,0,2]
                 }
             for pos in temp_list:
-                print(pos)
                 can_connect = True
                 difference = dict_one[pos[2]]
                 current_pos_group = (weight_group_array[pos[0]][pos[1]])[4]                
                 try:
                     if pos[0]+difference[0] == -1 or pos[1]+difference[1] == -1:
-                        print("error?")
                         error = pos[100]                       
                     connected_pos_group = (weight_group_array[pos[0]+difference[0]][pos[1]+difference[1]])[4]
-                    print(difference)
                     if current_pos_group == 0:
                         if connected_pos_group == 0:
                             (weight_group_array[pos[0]][pos[1]])[4] = group_designation
@@ -76,22 +68,13 @@ def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Al
                     if(can_connect):
                         (maze_array[pos[0]][pos[1]])[pos[2]] = 0
                         (maze_array[pos[0]+difference[0]][pos[1]+difference[1]])[difference[2]] = 0
-                        print("confirm")
                     (weight_group_array[pos[0]][pos[1]])[pos[2]] = max_weight+2
                     (weight_group_array[pos[0]+difference[0]][pos[1]+difference[1]])[difference[2]] = max_weight+2
                 except IndexError:
-                    print("error")
                     (weight_group_array[pos[0]][pos[1]])[pos[2]] = max_weight+2
                     if (weight_group_array[pos[0]][pos[1]])[4] == 0:
                         (weight_group_array[pos[0]][pos[1]])[4] = group_designation
                         group_designation += 1
-                print(maze_array)
-                print("")
-                print(weight_group_array)
-                print(n)
-                n += 1
-                print("")
-                print("")
     return maze_array
 
 def get_all_in_group(wg_array,width,height,group):
@@ -100,8 +83,6 @@ def get_all_in_group(wg_array,width,height,group):
         for y in range(0,height):
             if (wg_array[x][y])[4] == group:
                 temp_array.append([x,y])
-    print("Temp Array: " , temp_array)
-    print(group)
     return temp_array
                 
     
@@ -115,8 +96,6 @@ def all_in_one_group(wg_array,height,width):
                 first_group = temp
             if temp != first_group or temp == 0:
                 returned = False
-    #print(first_group)
-    #print("")
     return returned
 
 def lowest_values_pos(wg_array,width,height,compared_to):
