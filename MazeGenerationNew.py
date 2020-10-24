@@ -26,11 +26,10 @@ def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Al
     for x in range(0,width):
         weight_group_array.append([])
         for y in range(0,height):
-            weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])
-    group_designation = 1
+            weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])   #Create a sister array that stores the weight values and group of each cell
+    group_designation = 1                                                                                                                                           #The arrays are kept separate as only the maze_data needs to be returned
     temp_list_empty = False
-    n = 1
-    while not all_in_one_group(weight_group_array,height,width) or not temp_list_empty:
+    while not all_in_one_group(weight_group_array,height,width) or not temp_list_empty: #Only ends loop when no new corridors can be checked and all the corriders are in the same group
         temp_list = lowest_values_pos(weight_group_array,width,height,max_weight+1)
         if temp_list == []:
             temp_list_empty = True
@@ -77,7 +76,7 @@ def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Al
                         group_designation += 1
     return maze_array
 
-def get_all_in_group(wg_array,width,height,group):
+def get_all_in_group(wg_array,width,height,group):  #Gets the positions of all the cells that have the group specified
     temp_array = []
     for x in range(0,width):
         for y in range(0,height):
@@ -86,7 +85,7 @@ def get_all_in_group(wg_array,width,height,group):
     return temp_array
                 
     
-def all_in_one_group(wg_array,height,width):
+def all_in_one_group(wg_array,height,width):    #Checks to see if every cell is in a singular group (a.k.a every cell can be reached from any other cell)
     returned = True
     first_group = "null"
     for x in range(0,width):
@@ -98,7 +97,7 @@ def all_in_one_group(wg_array,height,width):
                 returned = False
     return returned
 
-def lowest_values_pos(wg_array,width,height,compared_to):
+def lowest_values_pos(wg_array,width,height,compared_to):   #Finds all the connections in the maze with the lowest weight value
     temp_list = []
     for x in range(0,width):
         for y in range(0,height):
@@ -110,6 +109,3 @@ def lowest_values_pos(wg_array,width,height,compared_to):
                 elif wg_array[x][y][i] == compared_to:
                     temp_list.append([x,y,i])
     return temp_list
-
-
-#generate_walled_maze(10,10,100)

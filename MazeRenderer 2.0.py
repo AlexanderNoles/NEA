@@ -250,7 +250,7 @@ def split_int(word):
     word = word.replace("\n","")
     return [int(char) for char in word]
 
-def pythag(a,b):
+def pythag(a,b):                #Intended to be used to help create the circle if visibilty around the player
     return ((a*a)+(b*b))**0.5
 
 maze_width = 10
