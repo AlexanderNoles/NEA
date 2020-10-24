@@ -63,12 +63,12 @@ def play_maze(width,height,title,maze_data):
                     first_frame = True
                     screen.fill(default)
                     from MazeGenerationNew import generate_random_walls
-                    maze_data = generate_random_walls(10,10)
+                    maze_data = generate_random_walls(100,100)
                 #Checks to make sure player can't go outside the maze
                 if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0])-1:
                     add_to_x = 0
                     check_walls = False
-                if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data):
+                if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data)-1:
                     add_to_y = 0
                     check_walls = False
                 #Checks to see if there is a wall in the players way
@@ -95,7 +95,9 @@ def play_maze(width,height,title,maze_data):
             if first_frame == True:                
                 first_frame = False
                 generated_data = draw_maze([width,height],cube_size,screen,maze_data)
+                #Create Title
                 text(title,3,[0,(((len(maze_data) * (cube_size-1))+1)/2)+15],white,screen,[width,height])
+                #Instantiate Player
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[0,len(maze_data)-1],True)
                 position_set_to = player_pos
             else:
@@ -145,7 +147,7 @@ def draw_maze(window_dimensions,cube_size,screen,maze_data): #This function will
         offsety += cube_size-1
         offsetx = 0
     #Maze Shell#
-    draw_rectangle([(0-maze_height/2),(0-maze_width/2)],maze_height,maze_width,False,white,screen,window_dimensions,[1,1,1,1])
+    #draw_rectangle([(0-maze_height/2),(0-maze_width/2)],maze_height,maze_width,False,white,screen,window_dimensions,[1,1,1,1])
     return [maze_width,maze_height,]
 
 def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args): #Draws the player in the center of a square, indicated by x and y coordinates
@@ -170,8 +172,8 @@ def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a p
     #Draw actual progress
     draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
 
-def text(text,text_size,offset,colour,screen,window_dimensions): #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
-    text_dict = {
+def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
+    text_dict = {                                                       #if border is true a border filling the screen horizontally will be made alongside it
         "a":0,"A":0,"b":1,"B":1,"c":2,"C":2,"d":3,"D":3,"e":4,"E":4,
         "f":5,"F":5,"g":6,"G":6,"h":7,"H":7,"i":8,"I":8,"j":9,"J":9,
         "k":10,"K":10,"l":11,"L":11,"m":12,"M":12,"n":13,"N":13,"o":14,"O":14,
@@ -248,6 +250,12 @@ def split_int(word):
     word = word.replace("\n","")
     return [int(char) for char in word]
 
-from MazeGenerationNew import generate_random_walls
-maze_data = generate_random_walls(100,100)
-play_maze(1500,1000,"100 x 100",maze_data)
+def pythag(a,b):
+    return ((a*a)+(b*b))**0.5
+
+maze_width = 3
+maze_height = 3
+from MazeGenerationNew import generate_walled_maze
+maze_data = generate_walled_maze(maze_height,maze_width,100)
+#maze_data = generate_random_walls(maze_height,maze_width)
+play_maze(1500,1000,(str(maze_height) + " x " + str(maze_width)),maze_data)
