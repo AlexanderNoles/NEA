@@ -62,8 +62,7 @@ def play_maze(width,height,title,maze_data):
                 if event.key == pygame.K_e: #This is a reset button and is only for testing, can be removed in final version
                     first_frame = True
                     screen.fill(default)
-                    from MazeGenerationNew import generate_random_walls
-                    maze_data = generate_random_walls(100,100)
+                    maze_data = generate_walled_maze(100,100,100)
                 #Checks to make sure player can't go outside the maze
                 if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0])-1:
                     add_to_x = 0
@@ -147,7 +146,7 @@ def draw_maze(window_dimensions,cube_size,screen,maze_data): #This function will
         offsety += cube_size-1
         offsetx = 0
     #Maze Shell#
-    #draw_rectangle([(0-maze_height/2),(0-maze_width/2)],maze_height,maze_width,False,white,screen,window_dimensions,[1,1,1,1])
+    draw_rectangle([(0-maze_height/2),(0-maze_width/2)],maze_height,maze_width,False,white,screen,window_dimensions,[1,1,1,1])
     return [maze_width,maze_height,]
 
 def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args): #Draws the player in the center of a square, indicated by x and y coordinates

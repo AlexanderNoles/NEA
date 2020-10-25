@@ -46,7 +46,7 @@ def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Al
                 current_pos_group = (weight_group_array[pos[0]][pos[1]])[4]                
                 try:
                     if pos[0]+difference[0] == -1 or pos[1]+difference[1] == -1:
-                        error = pos[100]                       
+                        error = pos[100]
                     connected_pos_group = (weight_group_array[pos[0]+difference[0]][pos[1]+difference[1]])[4]
                     if current_pos_group == 0:
                         if connected_pos_group == 0:
