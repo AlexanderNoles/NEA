@@ -16,7 +16,8 @@ def change_state(state):
     des()
     if state == "start":
         title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
-        start_button = tk.Button(window, text = "Start", bg = "white", command =  lambda: change_state("maze select")).pack()
+        start_button = tk.Button(window, text = "Start",width=30, bg = "white", command =  lambda: change_state("maze select")).pack()
+        exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=10)
     elif state == "maze select":
         title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,20))
         lines = load_completed_levels()
