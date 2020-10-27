@@ -5,6 +5,15 @@ import random
 empty = 0
 wall = 1
 
+def intialize_array(width,height):
+    #Intialize the array
+    maze_array = []
+    for x in range(0,width):
+        maze_array.append([])
+        for y in range(0,height):
+            maze_array[x].append([1,1,1,1]) #Add a blank cell with all four walls to create an array that will be altered to generate a maze, this array is the data we return
+    return maze_array
+
 def generate_random_walls(height,width):
     #Intialize the array
     maze_array = []
@@ -15,19 +24,32 @@ def generate_random_walls(height,width):
             maze_array[x].append([random.choice(temp_list),random.choice(temp_list),random.choice(temp_list),random.choice(temp_list)])
     return maze_array
 
-def generate_walled_maze(width,height,max_weight): #Very similar to Kruskal's Algorithim as outlined in the book "Mazes for Programmers"
-    #Intialize the array
-    maze_array = []
-    for x in range(0,width):
-        maze_array.append([])
-        for y in range(0,height):
-            maze_array[x].append([1,1,1,1]) #Add a blank cell with all four walls to create an array that will be altered to generate a maze
-    weight_group_array = []                 #This array is the data we return
+def generate_walled_maze(width,height,max_weight):
+    weight_group_array = []                 
     for x in range(0,width):
         weight_group_array.append([])
         for y in range(0,height):
-            weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])   #Create a sister array that stores the weight values and group of each cell
-    group_designation = 1                                                                                                                                           #The arrays are kept separate as only the maze_data needs to be returned
+            weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])   #Create a "sister" array that stores the weight values and group of each cell
+    maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
+    return maze_array
+
+def generate_circular_maze(width,height,max_weight):
+    weight_group_array = []
+    print("confirm")
+    for x in range(0,width):
+        weight_group_array.append([])
+        for y in range(0,height):
+            weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])
+    #Manipulate the weight group array to make the algorithim generate a circular maze with random gaps in the walls
+    random_center_coords = [random.randint(int(width/4),int(width*(3/4))),random.randint(int(height/4),int(height*(3/4)))]
+    weight_group_array[random_center_coords[0]][random_center_coords[1]] = [1,1,1,1,0]
+    maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
+    return maze_array
+    
+
+def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based on the algorithim as described in "Mazes for Programmers"
+    maze_array = intialize_array(width,height)
+    group_designation = 1                                                                                                                                           
     temp_list_empty = False
     while not all_in_one_group(weight_group_array,height,width) or not temp_list_empty: #Only ends loop when no new corridors can be checked and all the corriders are in the same group
         temp_list = lowest_values_pos(weight_group_array,width,height,max_weight+1)
@@ -109,3 +131,10 @@ def lowest_values_pos(wg_array,width,height,compared_to):   #Finds all the conne
                 elif wg_array[x][y][i] == compared_to:
                     temp_list.append([x,y,i])
     return temp_list
+
+def main(width,height,max_weight,maze_type):
+    if maze_type == "normal":
+        maze_data = generate_walled_maze(width,height,max_weight)
+    elif maze_type == "circular":
+        maze_data = generate_circular_maze(width,height,max_weight)
+    return maze_data

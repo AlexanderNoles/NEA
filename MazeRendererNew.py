@@ -26,6 +26,7 @@ def play_maze(width,height,title,maze_data):
     pygame.display.set_caption(title)
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
+    time_to_close = 1
     add_to_y = 0
     add_to_x = 0
     loading = True
@@ -40,11 +41,13 @@ def play_maze(width,height,title,maze_data):
         #Anything in this loop is run every frame (Equivalent to Unity's update() function)
         start_time = time.time() #For measuring execution time it is used for debug, testing program speed and the calculation of delta_time  
         for event in pygame.event.get():            
-            #Makes program stop when user closes the window
+            #Makes program stop when user closes the window or presses "esc"
             if event.type == pygame.QUIT:
                 running = False
-            #Checks if the player has pressed a move button (and which one it was) this frame
+            #Checks if the player has pressed a move button (and which one it was) this frame or if the player has pressed the escape key
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
                 if event.key == pygame.K_LEFT:
                     add_to_x = -1
                     move_dir = "left"
@@ -59,7 +62,7 @@ def play_maze(width,height,title,maze_data):
                     move_dir = "down"
                 else:
                     move_dir = ""
-                if event.key == pygame.K_e: #This is a reset button and is only for testing, can be removed in final version
+                if event.key == pygame.K_e and debug: #This is a reset button and is only for testing, can be removed in final version
                     first_frame = True
                     screen.fill(default)
                     maze_data = generate_walled_maze(100,100,100)
@@ -103,11 +106,20 @@ def play_maze(width,height,title,maze_data):
                 if won(player_pos,[len(maze_data[0])-1,0]):                    
                     screen.fill(default)
                     text("Maze Completed",5,[0,0],white,screen,[width,height])
+                    if time_to_close < 0:
+                        running = False
+                    else:
+                        time_to_close -= delta_time
                 else:
                     player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
         pygame.display.flip()                                                                                                                                                                
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
     pygame.quit()
+    if won(player_pos,[len(maze_data[0])-1,0]):
+        return True
+    else:
+        return False
+        
 
 #CHECKS
 def won(player_pos,win_pos): #Compares player position to entered position
@@ -249,11 +261,11 @@ def split_int(word):
     word = word.replace("\n","")
     return [int(char) for char in word]
 
-def pythag(a,b):                #Intended to be used to help create the circle if visibilty around the player
+def pythag(a,b):                #Intended to be used to help create the circle of visibilty around the player
     return ((a*a)+(b*b))**0.5
 
-maze_width = 10
-maze_height = 10
-from MazeGenerationNew import generate_walled_maze
-maze_data = generate_walled_maze(maze_height,maze_width,100)
-play_maze(1500,1000,(str(maze_height) + " x " + str(maze_width)),maze_data)
+#maze_width = 10
+#maze_height = 10
+#from MazeGenerationNew import generate_walled_maze
+#maze_data = generate_walled_maze(maze_height,maze_width,100)
+#play_maze(1500,1000,(str(maze_height) + " x " + str(maze_width)),maze_data)
