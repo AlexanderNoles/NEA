@@ -12,7 +12,7 @@ window.config(menu = root_menu)
 default_state = "start"
 
 #CREATE
-def change_state(state):
+def change_state(state,*args):
     des()
     if state == "start":
         title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
@@ -23,7 +23,7 @@ def change_state(state):
         lines = load_completed_levels()
         normal_maze_button = tk.Button(window, text = "\n  Normal Maze  \n",bg = "white",relief = 'groove', command = lambda: create_levels(1,90,"Normal Maze","normal",lines)).pack(pady=(50,10),fill='y')
         circular_maze_button = tk.Button(window, text = "\n Circular Maze \n",bg = "white",relief = 'groove',command = lambda: create_levels(1,90,"Circular Maze","circular",lines)).pack(pady=10,fill='y')
-        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',command = lambda: change_state("custom maze")).pack(pady=10,fill='y')
+        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',command = lambda: change_state("custom maze",False)).pack(pady=10,fill='y')
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("start")).pack(side="bottom",pady=10)
     elif state == "custom maze":
         first = tk.Frame(window)
@@ -32,14 +32,17 @@ def change_state(state):
         width = tk.Frame(window)
         width.pack(side='top')
         width_text = tk.Label(window, text = "Width").pack(in_ = width, side = "left",padx=4)
-        width_entry = tk.Entry(window, width=20).pack(in_ = width, side = "left")
+        width_entry = tk.Entry(window, width=20)
+        width_entry.pack(in_ = width, side = "left")
         height = tk.Frame(window)
         height.pack(side='top')
         height_text = tk.Label(window, text = "Height").pack(in_ = height, side = "left",padx=2,pady=4)
-        height_entry = tk.Entry(window, width=20).pack(in_ = height, side = "left")
-        generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white")
-        generate_maze.config(command = lambda w = width_entry.get(), h = height_entry.get(): custom_maze(w,h,"CUSTOM MAZE"))
-        generate_maze.pack(pady=30)      
+        height_entry = tk.Entry(window, width=20)
+        height_entry.pack(in_ = height, side = "left")
+        generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white", command = lambda w = width_entry, h = height_entry: custom_maze(h,w,"CUSTOM MAZE"))
+        generate_maze.pack(pady=30)
+        if(args[0]):
+            error_label = tk.Label(window, text = "Invalid Entry", fg = "red").pack()
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
 def create_levels(lower,upper,title,maze_type,lines): #create a number of ordered buttons
@@ -90,12 +93,12 @@ def load_maze(lower,upper,title,maze_type,index,btn):
 #BUTTONS
 def custom_maze(width,height,title):
     try:
-        width = int(width)
-        height = int(height)
+        width = int(width.get())
+        height = int(height.get())
         maze_data = main(width,height,100,"normal")
         play_maze(1500,1000,(str(width) + " x " + str(height)),maze_data)
     except:
-        print("ERROR")
+        change_state('custom maze',True)
         
 #OTHER
 def load_completed_levels():
