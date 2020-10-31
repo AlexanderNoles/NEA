@@ -1,5 +1,6 @@
 #Each cell in the array/maze stores its x, y, and four ints that indicate the state of the walls
 import random
+import time
 
 #How the data is encoded
 empty = 0
@@ -34,16 +35,52 @@ def generate_walled_maze(width,height,max_weight):
     return maze_array
 
 def generate_circular_maze(width,height,max_weight):
+    start_time = time.time()
     weight_group_array = []
-    print("confirm")
     for x in range(0,width):
         weight_group_array.append([])
         for y in range(0,height):
             weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])
     #Manipulate the weight group array to make the algorithim generate a circular maze with random gaps in the walls
     random_center_coords = [random.randint(int(width/4),int(width*(3/4))),random.randint(int(height/4),int(height*(3/4)))]
+    random_center_coords = [int(width/2),int(height/2)]
     weight_group_array[random_center_coords[0]][random_center_coords[1]] = [1,1,1,1,0]
+    weight_to_change_to = 2
+    dir_list = [[-1,0],[0,1],[1,0],[0,-1]]
+    move_dir_dict = {
+        0:[0,1],
+        1:[1,0],
+        2:[0,-1],
+        3:[-1,0]
+        }
+    start_side_list = [1,3,0,2]
+    for i in range(0,4):
+        new_pos = (random_center_coords[0] + dir_list[i][0], random_center_coords[1]+dir_list[i][1])
+        circiling = True
+        move_amount = 2
+        index = 0 + i 
+        current_pos = new_pos
+        while circiling:
+            try:
+                start_pos = current_pos
+                side_to_remove = start_side_list[index]
+                move_dir = move_dir_dict[index]               
+                for j in range(0,move_amount+1):
+                    current_pos = [start_pos[0]+(move_dir[0]*j),start_pos[1]+(move_dir[1]*j)]
+                    if current_pos[0] < 0 or current_pos[1] < 0:
+                        current_pos[len(current_pos)+2] = "error" #Intentionally cause an index error
+                    weight_group_array[current_pos[0]][current_pos[1]][side_to_remove] = weight_to_change_to                    
+                    if weight_to_change_to != max_weight:
+                        weight_to_change_to += 1               
+                move_amount += 2
+                index += 1
+                if index > (len(start_side_list)-1):
+                    index = 0                
+            except IndexError:
+                circiling = False
+    print(time.time() - start_time)    
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
+    print(time.time() - start_time) 
     return maze_array
     
 

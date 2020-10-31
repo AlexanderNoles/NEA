@@ -20,7 +20,7 @@ with open('font.txt') as f:
     f.close()
 
 #GAME LOGIC
-def play_maze(width,height,title,maze_data):
+def play_maze(width,height,title,cube_size,maze_data):
     pygame.init()
     screen = pygame.display.set_mode((width,height))
     pygame.display.set_caption(title)
@@ -35,7 +35,6 @@ def play_maze(width,height,title,maze_data):
     position_set_to = [0,0]
     move_dir = ""
     player_pos = [0,0]
-    cube_size = 10
     check_walls = True
     while running:
         #Anything in this loop is run every frame (Equivalent to Unity's update() function)
@@ -62,10 +61,8 @@ def play_maze(width,height,title,maze_data):
                     move_dir = "down"
                 else:
                     move_dir = ""
-                if event.key == pygame.K_e and debug: #This is a reset button and is only for testing, can be removed in final version
-                    first_frame = True
-                    screen.fill(default)
-                    maze_data = generate_walled_maze(100,100,100)
+                if event.key == pygame.K_e:
+                    print(player_pos)
                 #Checks to make sure player can't go outside the maze
                 if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0])-1:
                     add_to_x = 0
