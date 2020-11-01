@@ -11,6 +11,8 @@ root_menu = tk.Menu(window)
 window.config(menu = root_menu)
 default_state = "start"
 
+number_of_mazes = 2
+
 #CREATE
 def change_state(state,*args):
     des()
@@ -111,7 +113,13 @@ def custom_maze(width,height,cube_size,title):
         
 #OTHER
 def load_completed_levels():
-    text_file = open("CompletedLevels.txt",'r')
+    while True:
+        try:
+            text_file = open("CompletedLevels.txt",'r')
+            break
+        except:
+            text_file = open("CompletedLevels.txt",'w+')
+            text_file.write(("0\n"*number_of_mazes))
     temp_lines=text_file.readlines()
     text_file.close()
     to_return = []
