@@ -94,11 +94,13 @@ def load_maze(lower,upper,title,maze_type,index,btn):
     if won:
         #Edit the CompletedLevels text file to add the newely completed level (it should still be added even if the level has already been completed as it allows the program to record statistics about how many times the level has been completed)
         temp_lines = load_completed_levels()
+        print(temp_lines)
         temp_lines[index].append(maze_size - 9)
         text_file = open("CompletedLevels.txt","w")
-        text_file.writelines( (((str(temp_lines).replace("'","")).replace("]","\n")).replace("[","")).replace(" ","") )
+        text_file.writelines( ((((str(temp_lines).replace("'","")).replace("]","\n")).replace("[","")).replace(" ","")).replace(",,",",") )
         text_file.close()
     lines = load_completed_levels()
+    print(lines)
     create_levels(lower,upper,4,title,maze_type,lines)
 
 def custom_maze(width,height,cube_size,title):
@@ -119,7 +121,7 @@ def load_completed_levels():
             break
         except:
             text_file = open("CompletedLevels.txt",'w+')
-            text_file.write(("0\n"*number_of_mazes))
+            text_file.write(("0,\n"*number_of_mazes))
     temp_lines=text_file.readlines()
     text_file.close()
     to_return = []

@@ -26,7 +26,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     pygame.display.set_caption(title)
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
-    time_to_close = 1
+    time_to_close = 1.5
     add_to_y = 0
     add_to_x = 0
     loading = True
@@ -104,6 +104,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):                    
                     screen.fill(default)
                     text("Maze Completed",5,[0,0],white,screen,[width,height])
+                    text("#",5,[0,50],white,screen,[width,height])
                     if time_to_close < 0:
                         to_return = True
                         running = False
@@ -116,7 +117,6 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     pygame.quit()
     return to_return
         
-
 #CHECKS
 def won(player_pos,win_pos_x,win_pos_y): #Compares player position to entered position
     if player_pos[0] in win_pos_x and player_pos[1] in win_pos_y:
@@ -188,7 +188,7 @@ def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws e
         "p":15,"P":15,"q":16,"Q":16,"r":17,"R":17,"s":18,"S":18,"t":19,"T":19,
         "u":20,"U":20,"v":21,"V":21,"w":22,"W":22,"x":23,"X":23,"y":24,"Y":24,
         "z":25,"Z":25," ":26,"1":27,"2":28,"3":29,"4":30,"5":31,"6":32,"7":33,
-        "8":34,"9":35,"0":36
+        "8":34,"9":35,"0":36,"#":37
         }
     text_list = split(text)
     text_width = 0
@@ -260,9 +260,3 @@ def split_int(word):
 
 def pythag(a,b):                #Intended to be used to help create the circle of visibilty around the player
     return ((a*a)+(b*b))**0.5
-
-#maze_width = 10
-#maze_height = 10
-#from MazeGenerationNew import generate_walled_maze
-#maze_data = generate_walled_maze(maze_height,maze_width,100)
-#play_maze(1500,1000,(str(maze_height) + " x " + str(maze_width)),maze_data)
