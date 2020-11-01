@@ -42,9 +42,8 @@ def generate_circular_maze(width,height,max_weight):
         for y in range(0,height):
             weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])
     #Manipulate the weight group array to make the algorithim generate a circular maze with random gaps in the walls
-    random_center_coords = [random.randint(int(width/4),int(width*(3/4))),random.randint(int(height/4),int(height*(3/4)))]
-    random_center_coords = [int(width/2),int(height/2)]
-    weight_group_array[random_center_coords[0]][random_center_coords[1]] = [1,1,1,1,0]
+    center_coords = [int(width/2),int(height/2)]
+    weight_group_array[center_coords[0]][center_coords[1]] = [1,1,1,1,0]
     weight_to_change_to = 2
     dir_list = [[-1,0],[0,1],[1,0],[0,-1]]
     move_dir_dict = {
@@ -55,7 +54,7 @@ def generate_circular_maze(width,height,max_weight):
         }
     start_side_list = [1,3,0,2]
     for i in range(0,4):
-        new_pos = (random_center_coords[0] + dir_list[i][0], random_center_coords[1]+dir_list[i][1])
+        new_pos = (center_coords[0] + dir_list[i][0], center_coords[1]+dir_list[i][1])
         circiling = True
         move_amount = 2
         index = 0 + i 

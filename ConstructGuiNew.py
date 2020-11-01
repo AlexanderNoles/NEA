@@ -54,13 +54,13 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
     side = first
     title_ = tk.Label(window, text = ("\n" + title + "\nSelect a level\n"), bg = "white", borderwidth = 1, relief = "groove").pack(in_ = first,fill = "x",pady=20)
     top_seperator = tk.Canvas(window, height=50,width=0).pack(in_ = side)
-    for i in range((lower),(upper+1)):
-        text = str(i)
-        try:
-            dict_one = {
+    dict_one = {
                 "normal":0,
                 "circular":1
                 }
+    for i in range((lower),(upper+1)):
+        text = str(i)        
+        try:
             if lines[dict_one[maze_type]].count(text) > 0:
                 fg = "green"
                 text += "\n(Complete)"
@@ -76,11 +76,19 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
             middle.pack(side = "top")
             side = middle
     back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
-    
+
+#BUTTONS   
 def load_maze(lower,upper,title,maze_type,index,btn):
     maze_size = int((btn['text']).replace("\n(Complete)","")) + 9
     maze_data = main(maze_size,maze_size,10000,maze_type)
-    won = play_maze(1500,1000,(str(maze_size) + " x " + str(maze_size)),10,maze_data)
+    dict_two = {
+        "normal":[[len(maze_data[0])-1],[0],[0,len(maze_data)-1]],
+        "circular":[[len(maze_data[0])-1],[0],[int(maze_size/2),int(maze_size/2)]]
+        }
+    win_pos_x = (dict_two[maze_type])[0]
+    win_pos_y = (dict_two[maze_type])[1]
+    start_pos = (dict_two[maze_type])[2]
+    won = play_maze(1500,1000,(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
     if won:
         #Edit the CompletedLevels text file to add the newely completed level (it should still be added even if the level has already been completed as it allows the program to record statistics about how many times the level has been completed)
         temp_lines = load_completed_levels()
@@ -91,14 +99,13 @@ def load_maze(lower,upper,title,maze_type,index,btn):
     lines = load_completed_levels()
     create_levels(lower,upper,4,title,maze_type,lines)
 
-#BUTTONS
 def custom_maze(width,height,cube_size,title):
     try:
         width = int(width.get())
         height = int(height.get())
         cube_size = int(cube_size.get())
         maze_data = main(width,height,100,"normal")
-        play_maze(1500,1000,(str(width) + " x " + str(height)),cube_size,maze_data)
+        play_maze(1500,1000,(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
     except:
         change_state('custom maze',True)
         
