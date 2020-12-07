@@ -21,6 +21,8 @@ with open('font.txt') as f:
 
 #GAME LOGIC
 def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_data):
+    #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
+    if cube_size < 3: cube_size = 3 
     pygame.init()
     screen = pygame.display.set_mode((width,height))
     pygame.display.set_caption(title)
@@ -140,8 +142,6 @@ def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if th
 
 #RENDERING
 def draw_maze(window_dimensions,cube_size,win_pos_x,win_pos_y,screen,maze_data): #This function will draw a maze based on maze data generated in the maze generation script
-    #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
-    if cube_size < 3: cube_size = 3 
     #Content of maze#
     maze_width = (len(maze_data) * (cube_size-1))+1 #Calculates the dimensions of the maze, taking into account the fact the squares overlap
     maze_height = (len(maze_data[0]) * (cube_size-1))+1    

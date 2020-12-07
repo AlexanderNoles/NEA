@@ -1,10 +1,18 @@
 import tkinter as tk
+import csv
 
 from MazeGenerationNew import main
-from MazeRendererNew import play_maze
-
+try:
+    from MazeRendererNew import play_maze
+    installed = True
+except ImportError: #Pygame is not installed
+    installed = False
+    
 window = tk.Tk()
-window.state("zoomed")
+try:
+    window.state("zoomed")
+except:
+    window.state("normal")
 window.title("Maze Game")
 window.geometry("500x500")
 root_menu = tk.Menu(window)
@@ -17,21 +25,24 @@ number_of_mazes = 2
 def change_state(state,*args):
     des()
     if state == "start":
-        title = tk.Label(window, text = "\n Maze Game \n Version 1.0 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
+        title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
         start_button = tk.Button(window, text = "Start",width=30, bg = "white", command =  lambda: change_state("maze select")).pack()
         exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=10)
+        if not installed:
+            error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
     elif state == "maze select":
-        title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,20))
+        title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         lines = load_completed_levels()
-        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove', command = lambda: create_levels(1,30,4,"Normal Maze","normal",lines)).pack(pady=(50,10),fill='y')
-        circular_maze_button = tk.Button(window, text = "\n Labyrinth Maze \n",bg = "white",relief = 'groove',command = lambda: create_levels(1,30,4,"Labyrinth Maze","circular",lines)).pack(pady=10,fill='y')
-        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',command = lambda: change_state("custom maze",False)).pack(pady=10,fill='y')
+        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,30,4,"Normal Maze","normal",lines)).pack(pady=(50,10))
+        circular_maze_button = tk.Button(window, text = "\n Labyrinth Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,30,4,"Labyrinth Maze","circular",lines)).pack(pady=10)
+        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze",False)).pack(pady=10)
+        reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("start")).pack(side="bottom",pady=10)
     elif state == "custom maze":
         first = tk.Frame(window)
         title_ = tk.Label(window, text = ("\n Custom Maze \nType in dimensions\n"), bg = "white", borderwidth = 1, relief = "groove").pack(fill = "x",pady=20)
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
-        #Width
+        #Width reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white", command =  lambda: change_state("maze select")).pack()
         width_text = tk.Label(window, text = "Width").pack(padx=4)
         width_entry = tk.Entry(window, width=20)
         width_entry.pack()
@@ -82,25 +93,28 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
 #BUTTONS   
 def load_maze(lower,upper,title,maze_type,index,btn):
     maze_size = int((btn['text']).replace("\n(Complete)","")) + 9
-    maze_data = main(maze_size,maze_size,10000,maze_type)
-    dict_two = {
-        "normal":[[len(maze_data[0])-1],[0],[0,len(maze_data)-1]],
-        "circular":[[len(maze_data[0])-1],[0],[int(maze_size/2),int(maze_size/2)]]
-        }
-    win_pos_x = (dict_two[maze_type])[0]
-    win_pos_y = (dict_two[maze_type])[1]
-    start_pos = (dict_two[maze_type])[2]
-    won = play_maze(1500,1000,(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
+    if installed:        
+        maze_data = main(maze_size,maze_size,10000,maze_type)
+        dict_two = {
+            "normal":[[len(maze_data[0])-1],[0],[0,len(maze_data)-1]],
+            "circular":[[len(maze_data[0])-1],[0],[int(maze_size/2),int(maze_size/2)]]
+            }
+        win_pos_x = (dict_two[maze_type])[0]
+        win_pos_y = (dict_two[maze_type])[1]
+        start_pos = (dict_two[maze_type])[2]
+        won = play_maze(1500,1000,(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
+    else:
+        won = True
     if won:
         #Edit the CompletedLevels text file to add the newely completed level (it should still be added even if the level has already been completed as it allows the program to record statistics about how many times the level has been completed)
         temp_lines = load_completed_levels()
         print(temp_lines)
         temp_lines[index].append(maze_size - 9)
-        text_file = open("CompletedLevels.txt","w")
-        text_file.writelines( ((((str(temp_lines).replace("'","")).replace("]","\n")).replace("[","")).replace(" ","")).replace(",,",",") )
-        text_file.close()
+        #text_file.writelines(temp_lines)
+        with open('CompletedLevels.txt', 'w') as csvfile:
+            writer = csv.writer(csvfile, delimiter=",")
+            writer.writerow(temp_lines)
     lines = load_completed_levels()
-    print(lines)
     create_levels(lower,upper,4,title,maze_type,lines)
 
 def custom_maze(width,height,cube_size,title):
@@ -112,6 +126,11 @@ def custom_maze(width,height,cube_size,title):
         play_maze(1500,1000,(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
     except:
         change_state('custom maze',True)
+
+def reset_progress():
+    text_file = open("CompletedLevels.txt",'w+')
+    text_file.write(("0\n"*number_of_mazes))
+    text_file.close()
         
 #OTHER
 def load_completed_levels():
@@ -120,15 +139,18 @@ def load_completed_levels():
             text_file = open("CompletedLevels.txt",'r')
             break
         except:
-            text_file = open("CompletedLevels.txt",'w+')
-            text_file.write(("0,\n"*number_of_mazes))
+            reset_progress()
+    lines = open("CompletedLevels.txt",'r')
     temp_lines=text_file.readlines()
-    text_file.close()
+    lines.close()
     to_return = []
-    for i in range(0,len(temp_lines)):
-        to_return.append(temp_lines[i].split(','))
-        for j in range(0,len(to_return[i])):
-            to_return[i][j] = str(to_return[i][j]).replace('\n','')
+    with open('CompletedLevels.txt',newline='') as file:
+        reader = csv.reader(file)
+        to_return = list(reader)
+    #for i in range(0,len(temp_lines)):
+        #to_return.append(temp_lines[i].split(','))
+        #for j in range(0,len(to_return[i])):
+            #to_return[i][j] = str(to_return[i][j]).replace('\n','')
     return to_return
     
 def des(): #Deletes all current widgets in "window"
