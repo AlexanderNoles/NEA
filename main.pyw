@@ -30,31 +30,28 @@ number_of_mazes = 2
 def change_state(state,*args):
     des()
     if state == "username":
-        username_text = tk.Label(window, text="Username").pack(pady=(250,2))
+        title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
+        username_text = tk.Label(window, text="Username").pack(pady=(10,2))
         username = tk.Entry(window, width=35)
         username.pack()
-        #enter_button = tk.Button(window, text = "Enter",bg = "white", command = lambda: return_user_id(username,False)).pack()
         buttons_frame = tk.Frame(window)
         buttons_frame.pack(side='top',pady=8)
-        guest_button = tk.Button(buttons_frame, text = "Play as Guest",bg = "white",width=10, command = lambda: return_user_id(username,True)).pack(side="left",padx=20)
+        guest_button = tk.Button(buttons_frame, text = "Play as Guest",bg = "white",width=10, command = lambda: return_user_id(username,True)).pack(side="left",padx=0)
         enter_button = tk.Button(buttons_frame, text = "Enter",bg = "white",width=10, command = lambda: return_user_id(username,False)).pack(side="left")
-        create_new_button = tk.Button(buttons_frame,text="Create New",bg = "white",width=10).pack(side="left",padx=20)
+        create_new_button = tk.Button(buttons_frame,text="Create New",bg = "white",width=10).pack(side="left",padx=0)
+        exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=20)
         if not valid_user:
-            error_message = tk.Label(window,text="Invalid User",fg="red").pack(side="bottom",pady = 20)
-    elif state == "start":
-        title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
-        start_button = tk.Button(window, text = "Start",width=30, bg = "white", command =  lambda: change_state("maze select")).pack()
-        exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=10)
-        if not installed:
-            error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
+            error_message = tk.Label(window,text="[Invalid User]",fg="red").pack(side="bottom",pady = 20)  
     elif state == "maze select":
         title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         lines = load_completed_levels()
         normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,30,4,"Normal Maze","normal",lines)).pack(pady=(50,10))
         circular_maze_button = tk.Button(window, text = "\n Labyrinth Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,30,4,"Labyrinth Maze","circular",lines)).pack(pady=10)
         custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze",False)).pack(pady=10)
-        reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)
-        back_button = tk.Button(window, text = "Back", command = lambda: change_state("start")).pack(side="bottom",pady=10)
+        reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)        
+        back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)
+        if not installed:
+            error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
     elif state == "custom maze":
         first = tk.Frame(window)
         title_ = tk.Label(window, text = ("\n Custom Maze \nType in dimensions\n"), bg = "white", borderwidth = 1, relief = "groove").pack(fill = "x",pady=20)
@@ -155,13 +152,16 @@ def return_user_id(username,guest):
     global user_id
     if guest:
         user_id = 0
-        change_state("start")
+        change_state("maze select")
     else:
         username = username.get()
         if username == '':
             global valid_user
             valid_user = False
             change_state("username")
+        else:
+            #Get user_id from database, if it doesn't exist make valid_user = False
+            pass
         
 
 def reset_progress():
@@ -170,7 +170,7 @@ def reset_progress():
     text_file.close()
 
 #DATABASES
-#User database stores name and user id
+#User database stores name and user_id
 #Stats stores refrence to completed levels for that user (identified by their id) and stores statistics about said player
             
 def load_database(db_file):
