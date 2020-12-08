@@ -19,14 +19,29 @@ window.title("Maze Game")
 window.geometry("500x500")
 root_menu = tk.Menu(window)
 window.config(menu = root_menu)
-default_state = "start"
+default_state = "username"
+
+user_id = 0
+valid_user = True
 
 number_of_mazes = 2
 
 #CREATE
 def change_state(state,*args):
     des()
-    if state == "start":
+    if state == "username":
+        username_text = tk.Label(window, text="Username").pack(pady=(250,2))
+        username = tk.Entry(window, width=35)
+        username.pack()
+        #enter_button = tk.Button(window, text = "Enter",bg = "white", command = lambda: return_user_id(username,False)).pack()
+        buttons_frame = tk.Frame(window)
+        buttons_frame.pack(side='top',pady=8)
+        guest_button = tk.Button(buttons_frame, text = "Play as Guest",bg = "white",width=10, command = lambda: return_user_id(username,True)).pack(side="left",padx=20)
+        enter_button = tk.Button(buttons_frame, text = "Enter",bg = "white",width=10, command = lambda: return_user_id(username,False)).pack(side="left")
+        create_new_button = tk.Button(buttons_frame,text="Create New",bg = "white",width=10).pack(side="left",padx=20)
+        if not valid_user:
+            error_message = tk.Label(window,text="Invalid User",fg="red").pack(side="bottom",pady = 20)
+    elif state == "start":
         title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
         start_button = tk.Button(window, text = "Start",width=30, bg = "white", command =  lambda: change_state("maze select")).pack()
         exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=10)
@@ -114,14 +129,15 @@ def load_maze(lower,upper,title,maze_type,index,btn):
     else:
         won = True
     if won:
-        #Edit the CompletedLevels text file to add the newely completed level (it should still be added even if the level has already been completed as it allows the program to record statistics about how many times the level has been completed)
-        temp_lines = load_completed_levels()
-        print(temp_lines)
-        temp_lines[index].append(maze_size - 9)
-        #text_file.writelines(temp_lines)
-        with open('CompletedLevels.txt', 'w') as csvfile:
-            writer = csv.writer(csvfile, delimiter=",")
-            writer.writerow(temp_lines)
+        if user_id != 0:
+            #Edit the CompletedLevels text file to add the newely completed level (it should still be added even if the level has already been completed as it allows the program to record statistics about how many times the level has been completed)
+            temp_lines = load_completed_levels()
+            print(temp_lines)
+            temp_lines[index].append(maze_size - 9)
+            #text_file.writelines(temp_lines)
+            with open('CompletedLevels.txt', 'w') as csvfile:
+                writer = csv.writer(csvfile, delimiter=",")
+                writer.writerow(temp_lines)
     lines = load_completed_levels()
     create_levels(lower,upper,4,title,maze_type,lines)
 
@@ -135,6 +151,19 @@ def custom_maze(maze_type,width,height,cube_size,title):
     except:
         change_state('custom maze',True)
 
+def return_user_id(username,guest):    
+    global user_id
+    if guest:
+        user_id = 0
+        change_state("start")
+    else:
+        username = username.get()
+        if username == '':
+            global valid_user
+            valid_user = False
+            change_state("username")
+        
+
 def reset_progress():
     text_file = open("CompletedLevels.txt",'w+')
     text_file.write(("0\n"*number_of_mazes))
@@ -142,9 +171,7 @@ def reset_progress():
 
 #DATABASES
 #User database stores name and user id
-#Stats stores refrence to completed levels for that user and stores statistics about said player
-def load_completed_levels_new():
-    users = load_database()
+#Stats stores refrence to completed levels for that user (identified by their id) and stores statistics about said player
             
 def load_database(db_file):
     connection = None
