@@ -161,8 +161,7 @@ def return_user_id(username,guest):
             change_state("username")
         else:
             #Get user_id from database, if it doesn't exist make valid_user = False
-            pass
-        
+            pass     
 
 def reset_progress():
     text_file = open("CompletedLevels.txt",'w+')
@@ -170,8 +169,9 @@ def reset_progress():
     text_file.close()
 
 #DATABASES
-#User database stores name and user_id
-#Stats stores refrence to completed levels for that user (identified by their id) and stores statistics about said player
+#User database stores name and user_id + any additional information needed
+#CompletedLevels stores the completed levels linked to the foreign key user_id. There will be two columns linked to each completed_id and user_id (one to one), one for normal mazes, one for labyrinth mazes
+#the completed levels will be serialized as such (1#3#4#12...) and when the string is imported it will be split into a list.
             
 def load_database(db_file):
     connection = None
@@ -183,24 +183,9 @@ def load_database(db_file):
 
 #OTHER
 def load_completed_levels():
-    while True:
-        try:
-            text_file = open("CompletedLevels.txt",'r')
-            break
-        except:
-            reset_progress()
-    lines = open("CompletedLevels.txt",'r')
-    temp_lines=text_file.readlines()
-    lines.close()
-    to_return = []
-    with open('CompletedLevels.txt',newline='') as file:
-        reader = csv.reader(file)
-        to_return = list(reader)
-    #for i in range(0,len(temp_lines)):
-        #to_return.append(temp_lines[i].split(','))
-        #for j in range(0,len(to_return[i])):
-            #to_return[i][j] = str(to_return[i][j]).replace('\n','')
-    return to_return
+    #Loads the completed levels based on the file (the location of which is stored in the stats database) linked to the user id
+    
+    return []
 
 
     
