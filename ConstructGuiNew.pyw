@@ -1,5 +1,7 @@
 import tkinter as tk
 import csv
+import sqlite3
+from sqlite3 import Error
 
 from MazeGenerationNew import main
 try:
@@ -42,7 +44,13 @@ def change_state(state,*args):
         first = tk.Frame(window)
         title_ = tk.Label(window, text = ("\n Custom Maze \nType in dimensions\n"), bg = "white", borderwidth = 1, relief = "groove").pack(fill = "x",pady=20)
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
-        #Width reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white", command =  lambda: change_state("maze select")).pack()
+        #Maze Type 
+        #maze_type_text = tk.Label(window, text = "Type").pack(padx=4)
+        variable = tk.StringVar(window)
+        variable.set("normal")
+        #maze_type_menu = tk.OptionMenu(window, variable, "normal","circular")
+        #maze_type_menu.pack()
+        #Width
         width_text = tk.Label(window, text = "Width").pack(padx=4)
         width_entry = tk.Entry(window, width=20)
         width_entry.pack()
@@ -54,7 +62,7 @@ def change_state(state,*args):
         cs_text = tk.Label(window, text = "Cell Size").pack(padx=1,pady=4)
         cs_entry = tk.Entry(window, width=20)
         cs_entry.pack()       
-        generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white", command = lambda w = width_entry, h = height_entry, c = cs_entry: custom_maze(h,w,c,"CUSTOM MAZE"))
+        generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white", command = lambda mt = variable, w = width_entry, h = height_entry, c = cs_entry: custom_maze(mt,h,w,c,"CUSTOM MAZE"))
         generate_maze.pack(pady=30)
         if(args[0]):
             error_label = tk.Label(window, text = "Invalid Entry", fg = "red").pack()
@@ -117,12 +125,12 @@ def load_maze(lower,upper,title,maze_type,index,btn):
     lines = load_completed_levels()
     create_levels(lower,upper,4,title,maze_type,lines)
 
-def custom_maze(width,height,cube_size,title):
+def custom_maze(maze_type,width,height,cube_size,title):
     try:
         width = int(width.get())
         height = int(height.get())
         cube_size = int(cube_size.get())
-        maze_data = main(width,height,100,"normal")
+        maze_data = main(width,height,100,maze_type.get())
         play_maze(1500,1000,(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
     except:
         change_state('custom maze',True)
@@ -131,7 +139,21 @@ def reset_progress():
     text_file = open("CompletedLevels.txt",'w+')
     text_file.write(("0\n"*number_of_mazes))
     text_file.close()
-        
+
+#DATABASES
+#User database stores name and user id
+#Stats stores refrence to completed levels for that user and stores statistics about said player
+def load_completed_levels_new():
+    users = load_database()
+            
+def load_database(db_file):
+    connection = None
+    try:
+        connection = sqlite3.connect(db_file)
+    except Error as e:
+        print(e)
+    return connection
+
 #OTHER
 def load_completed_levels():
     while True:
@@ -152,6 +174,8 @@ def load_completed_levels():
         #for j in range(0,len(to_return[i])):
             #to_return[i][j] = str(to_return[i][j]).replace('\n','')
     return to_return
+
+
     
 def des(): #Deletes all current widgets in "window"
     widget_list = all_children(window)

@@ -39,6 +39,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     player_pos = start_pos
     check_walls = True
     to_return = False
+    ending = True
     while running:
         #Anything in this loop is run every frame (Equivalent to Unity's update() function)
         start_time = time.time() #For measuring execution time it is used for debug, testing program speed and the calculation of delta_time  
@@ -103,7 +104,10 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],player_pos,True)
                 position_set_to = player_pos
             else:
-                if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):                    
+                if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):
+                    if ending:
+                        time.sleep(0.4) #Halts the game for a very short amount of time to make the transition to the end screen smoother
+                        ending = False
                     screen.fill(default)
                     text("Maze Completed",5,[0,0],white,screen,[width,height])
                     text("#",5,[0,50],white,screen,[width,height])
@@ -151,7 +155,7 @@ def draw_maze(window_dimensions,cube_size,win_pos_x,win_pos_y,screen,maze_data):
         for x in range(0, len(maze_data[y])):
             draw_rectangle([(0-(maze_height/2)+offsetx),((0-maze_width/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[y][x])
             if won([x,y],win_pos_x,win_pos_y):
-                draw_rectangle([(0-(maze_height/2)+offsetx+2),((0-maze_width/2)+offsety+2)],cube_size-4,cube_size-4,True,white,screen,window_dimensions)
+                draw_rectangle([(0-(maze_height/2)+offsetx+2),((0-maze_width/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
                 #draw_rectangle([(0-(maze_height/2)+offsetx+(cube_size-1)),((0-maze_width/2)+offsety)],cube_size-4,cube_size-1,True,black,screen,window_dimensions) #Alternate maze exit
             offsetx += cube_size-1    
         offsety += cube_size-1
@@ -169,8 +173,8 @@ def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensi
         else:
             old_player_pos = find_center_of_square(maze_width,maze_height,cube_size,args[0])
             player_pos = find_center_of_square(maze_width,maze_height,cube_size,new_pos)
-            draw_rectangle(old_player_pos,player_size,player_size,True,black,screen,window_dimensions) #Remove previous player_pos   
-            draw_rectangle(player_pos,player_size,player_size,True,green,screen,window_dimensions)                   
+            draw_rectangle(old_player_pos,player_size,player_size,True,default,screen,window_dimensions) #Remove previous player_pos   
+            draw_rectangle(player_pos,player_size,player_size,True,white,screen,window_dimensions)                   
     return new_pos
 
 def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
@@ -181,7 +185,7 @@ def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a p
     draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
 
 def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
-    text_dict = {                                                       #if border is true a border filling the screen horizontally will be made alongside it
+    text_dict = {                                                       
         "a":0,"A":0,"b":1,"B":1,"c":2,"C":2,"d":3,"D":3,"e":4,"E":4,
         "f":5,"F":5,"g":6,"G":6,"h":7,"H":7,"i":8,"I":8,"j":9,"J":9,
         "k":10,"K":10,"l":11,"L":11,"m":12,"M":12,"n":13,"N":13,"o":14,"O":14,
