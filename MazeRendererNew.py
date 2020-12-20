@@ -24,7 +24,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
     if cube_size < 3: cube_size = 3 
     pygame.init()
-    screen = pygame.display.set_mode((width,height))
+    screen = pygame.display.set_mode((width,height), pygame.FULLSCREEN)
     pygame.display.set_caption(title)
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
@@ -92,13 +92,17 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 loading = False
                 screen.fill(default)
             else:
-                progress_bar(width/4,temp,screen,[0,0],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
+                if temp == 0:
+                    #Create Title
+                    text("Maze Game",10,[0,0],white,screen,[width,height])
+                    time.sleep(0.1)
+                progress_bar(width/4,temp,screen,[0,height/4],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
                 temp += 1 * delta_time                                  #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
         elif not loading:                                               #the progress bar would have to be called from the MazeGenerationNew script)
             if first_frame == True:                
                 first_frame = False
                 generated_data = draw_maze([width,height],cube_size,win_pos_x,win_pos_y,screen,maze_data)
-                #Create Title
+                #Create Maze Title
                 text(title,3,[0,(((len(maze_data) * (cube_size-1))+1)/2)+15],white,screen,[width,height])
                 #Instantiate Player
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],player_pos,True)
@@ -156,7 +160,6 @@ def draw_maze(window_dimensions,cube_size,win_pos_x,win_pos_y,screen,maze_data):
             draw_rectangle([(0-(maze_height/2)+offsetx),((0-maze_width/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[y][x])
             if won([x,y],win_pos_x,win_pos_y):
                 draw_rectangle([(0-(maze_height/2)+offsetx+2),((0-maze_width/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
-                #draw_rectangle([(0-(maze_height/2)+offsetx+(cube_size-1)),((0-maze_width/2)+offsety)],cube_size-4,cube_size-1,True,black,screen,window_dimensions) #Alternate maze exit
             offsetx += cube_size-1    
         offsety += cube_size-1
         offsetx = 0
@@ -178,7 +181,7 @@ def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensi
     return new_pos
 
 def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
-    center = [0+offset[0],0+offset[0]]
+    center = [0+offset[0],0+offset[1]]
     #Draw progress bar shell
     draw_rectangle([int(center[0]-width/2),center[1]],width,15,False,white,screen,window_dimensions,1)
     #Draw actual progress

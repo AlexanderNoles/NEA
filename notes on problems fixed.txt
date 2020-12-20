@@ -1,0 +1,2 @@
+- Fixed maze generation taking a long time (weight issue)
+- Fixed wall detection not working (actually a rendering issue)

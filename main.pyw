@@ -1,5 +1,4 @@
 import tkinter as tk
-import csv
 import sqlite3
 from sqlite3 import Error
 
@@ -21,6 +20,11 @@ root_menu = tk.Menu(window)
 window.config(menu = root_menu)
 default_state = "start"
 
+import ctypes
+user32 = ctypes.windll.user32
+screen_width = user32.GetSystemMetrics(0)
+screen_height = user32.GetSystemMetrics(1)
+
 user_id = 0
 
 number_of_mazes = 2
@@ -35,10 +39,11 @@ def change_state(state,*args):
         if not installed:
             error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
     if state == "username":
+        title = tk.Label(window, text = "\n Accounts \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
-        guest_button = tk.Button(window, text = "Play as Guest",bg = "white",width=30, command = lambda u = "guest": set_user_id(u,True)).pack(pady=3)
-        for i in range(0,5): #will eventually base the amount of buttons off the amount of users
-            username_button = tk.Button(window,text="stand-in",bg = "white",width=30)
+        guest_button = tk.Button(window, text = "Play as Guest",bg = "white",width=30,height=2, command = lambda u = "guest": set_user_id(u,True)).pack(pady=3)
+        for i in range(0,0): #will eventually base the amount of buttons off the amount of users
+            username_button = tk.Button(window,text="stand-in",bg = "white",width=30,height=2)
             username_button.config(command = lambda u = username_button: set_user_id(u,False))
             username_button.pack(pady=3)
         create_new_button = tk.Button(window,text="+",bg = "white",width=10, command = lambda: change_state("new user")).pack(pady=3)
@@ -47,7 +52,7 @@ def change_state(state,*args):
     elif state == "maze select":
         title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         lines = load_completed_levels()
-        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,100,10,"Normal Maze","normal",lines)).pack(pady=(50,10))
+        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,30,4,"Normal Maze","normal",lines)).pack(pady=(50,10))
         circular_maze_button = tk.Button(window, text = "\n Labyrinth Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,30,4,"Labyrinth Maze","circular",lines)).pack(pady=10)
         custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze",False)).pack(pady=10)
         reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)        
@@ -114,7 +119,7 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
 def load_maze(lower,upper,title,maze_type,index,btn):
     maze_size = int((btn['text']).replace("\n(Complete)","")) + 9
     if installed:        
-        maze_data = main(maze_size,maze_size,10,maze_type)
+        maze_data = main(maze_size,maze_size,5,maze_type)
         dict_two = {
             "normal":[[len(maze_data[0])-1],[0],[0,len(maze_data)-1]],
             "circular":[[len(maze_data[0])-1],[0],[int(maze_size/2),int(maze_size/2)]]
@@ -122,7 +127,7 @@ def load_maze(lower,upper,title,maze_type,index,btn):
         win_pos_x = (dict_two[maze_type])[0]
         win_pos_y = (dict_two[maze_type])[1]
         start_pos = (dict_two[maze_type])[2]
-        won = play_maze(1500,1000,(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
+        won = play_maze(screen_width,screen_height,(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
     else:
         won = True
     if won:
@@ -136,14 +141,14 @@ def load_maze(lower,upper,title,maze_type,index,btn):
                 writer = csv.writer(csvfile, delimiter=",")
                 writer.writerow(temp_lines)
     lines = load_completed_levels()
-    create_levels(lower,upper,10,title,maze_type,lines)
+    create_levels(lower,upper,4,title,maze_type,lines)
 
 def custom_maze(maze_type,width,height,cube_size,title):
     try:
         width = int(width.get())
         height = int(height.get())
         cube_size = int(cube_size.get())
-        maze_data = main(width,height,10,maze_type.get())
+        maze_data = main(width,height,5,maze_type.get())
         play_maze(1500,1000,(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
     except:
         change_state('custom maze',True)
@@ -157,7 +162,7 @@ def set_user_id(username,guest):
         username = (username['text'])
         print(username)
         #Get user_id from database based on username
-        pass     
+        pass
 
 def reset_progress():
     text_file = open("CompletedLevels.txt",'w+')
@@ -180,11 +185,8 @@ def create_connection(db_file):
 #OTHER
 def load_completed_levels():
     #Loads the completed levels based on the file (the location of which is stored in the stats database) linked to the user id
-    
     return []
-
-
-    
+  
 def des(): #Deletes all current widgets in "window"
     widget_list = all_children(window)
     for item in widget_list:

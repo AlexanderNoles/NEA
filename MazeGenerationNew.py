@@ -84,7 +84,6 @@ def generate_circular_maze(width,height,max_weight):
     
 
 def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based on the algorithim as described in "Mazes for Programmers"
-    start_time = time.time()    #DEBUG
     maze_array = intialize_array(width,height)
     group_designation = 1                                                                                                                                           
     temp_list_empty = False
@@ -133,7 +132,6 @@ def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based on t
                     if (weight_group_array[pos[0]][pos[1]])[4] == 0:
                         (weight_group_array[pos[0]][pos[1]])[4] = group_designation
                         group_designation += 1
-    print(time.time() - start_time) #DEBUG
     return maze_array
 
 def get_all_in_group(wg_array,width,height,group):  #Gets the positions of all the cells that have the group specified
@@ -176,12 +174,3 @@ def main(width,height,max_weight,maze_type):
     elif maze_type == "circular":
         maze_data = generate_circular_maze(width,height,max_weight)
     return maze_data
-
-n = 60
-while n < 50:
-    generate_walled_maze(n,n,10)
-    generate_circular_maze(n,n,10)
-    n += 1
-    print("\n")
-
-generate_walled_maze(50,50,10)
