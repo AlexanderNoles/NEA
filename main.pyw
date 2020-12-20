@@ -19,39 +19,39 @@ window.title("Maze Game")
 window.geometry("500x500")
 root_menu = tk.Menu(window)
 window.config(menu = root_menu)
-default_state = "username"
+default_state = "start"
 
 user_id = 0
-valid_user = True
 
 number_of_mazes = 2
 
 #CREATE
 def change_state(state,*args):
     des()
-    if state == "username":
+    if state == "start":
         title = tk.Label(window, text = "\n Maze Game \n Version 1.1 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
-        username_text = tk.Label(window, text="Username").pack(pady=(10,2))
-        username = tk.Entry(window, width=35)
-        username.pack()
-        buttons_frame = tk.Frame(window)
-        buttons_frame.pack(side='top',pady=8)
-        guest_button = tk.Button(buttons_frame, text = "Play as Guest",bg = "white",width=10, command = lambda: return_user_id(username,True)).pack(side="left",padx=0)
-        enter_button = tk.Button(buttons_frame, text = "Enter",bg = "white",width=10, command = lambda: return_user_id(username,False)).pack(side="left")
-        create_new_button = tk.Button(buttons_frame,text="Create New",bg = "white",width=10).pack(side="left",padx=0)
-        exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=20)
-        if not valid_user:
-            error_message = tk.Label(window,text="[Invalid User]",fg="red").pack(side="bottom",pady = 20)  
+        enter_button = tk.Button(window, text = "Enter",bg = "white",width=30, command = lambda: change_state("username")).pack()
+        exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=3)
+        if not installed:
+            error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
+    if state == "username":
+        top_seperator = tk.Canvas(window, height=50,width=0).pack()
+        guest_button = tk.Button(window, text = "Play as Guest",bg = "white",width=30, command = lambda u = "guest": set_user_id(u,True)).pack(pady=3)
+        for i in range(0,5): #will eventually base the amount of buttons off the amount of users
+            username_button = tk.Button(window,text="stand-in",bg = "white",width=30)
+            username_button.config(command = lambda u = username_button: set_user_id(u,False))
+            username_button.pack(pady=3)
+        create_new_button = tk.Button(window,text="+",bg = "white",width=10, command = lambda: change_state("new user")).pack(pady=3)
+    elif state == "new user":
+        pass
     elif state == "maze select":
         title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         lines = load_completed_levels()
-        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,30,4,"Normal Maze","normal",lines)).pack(pady=(50,10))
+        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,100,10,"Normal Maze","normal",lines)).pack(pady=(50,10))
         circular_maze_button = tk.Button(window, text = "\n Labyrinth Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,30,4,"Labyrinth Maze","circular",lines)).pack(pady=10)
         custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze",False)).pack(pady=10)
         reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)        
-        back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)
-        if not installed:
-            error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
+        back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)      
     elif state == "custom maze":
         first = tk.Frame(window)
         title_ = tk.Label(window, text = ("\n Custom Maze \nType in dimensions\n"), bg = "white", borderwidth = 1, relief = "groove").pack(fill = "x",pady=20)
@@ -114,7 +114,7 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
 def load_maze(lower,upper,title,maze_type,index,btn):
     maze_size = int((btn['text']).replace("\n(Complete)","")) + 9
     if installed:        
-        maze_data = main(maze_size,maze_size,10000,maze_type)
+        maze_data = main(maze_size,maze_size,10,maze_type)
         dict_two = {
             "normal":[[len(maze_data[0])-1],[0],[0,len(maze_data)-1]],
             "circular":[[len(maze_data[0])-1],[0],[int(maze_size/2),int(maze_size/2)]]
@@ -136,32 +136,28 @@ def load_maze(lower,upper,title,maze_type,index,btn):
                 writer = csv.writer(csvfile, delimiter=",")
                 writer.writerow(temp_lines)
     lines = load_completed_levels()
-    create_levels(lower,upper,4,title,maze_type,lines)
+    create_levels(lower,upper,10,title,maze_type,lines)
 
 def custom_maze(maze_type,width,height,cube_size,title):
     try:
         width = int(width.get())
         height = int(height.get())
         cube_size = int(cube_size.get())
-        maze_data = main(width,height,100,maze_type.get())
+        maze_data = main(width,height,10,maze_type.get())
         play_maze(1500,1000,(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
     except:
         change_state('custom maze',True)
 
-def return_user_id(username,guest):    
+def set_user_id(username,guest):    
     global user_id
     if guest:
         user_id = 0
         change_state("maze select")
     else:
-        username = username.get()
-        if username == '':
-            global valid_user
-            valid_user = False
-            change_state("username")
-        else:
-            #Get user_id from database, if it doesn't exist make valid_user = False
-            pass     
+        username = (username['text'])
+        print(username)
+        #Get user_id from database based on username
+        pass     
 
 def reset_progress():
     text_file = open("CompletedLevels.txt",'w+')
@@ -169,11 +165,11 @@ def reset_progress():
     text_file.close()
 
 #DATABASES
-#User database stores name and user_id + any additional information needed
-#CompletedLevels stores the completed levels linked to the foreign key user_id. There will be two columns linked to each completed_id and user_id (one to one), one for normal mazes, one for labyrinth mazes
+#User table stores name and user_id + any additional information needed
+#CompletedLevels table stores the completed levels linked to the foreign key user_id and a primary key completed_id. There will be two columns, one for normal mazes, one for labyrinth mazes
 #the completed levels will be serialized as such (1#3#4#12...) and when the string is imported it will be split into a list.
             
-def load_database(db_file):
+def create_connection(db_file):
     connection = None
     try:
         connection = sqlite3.connect(db_file)
