@@ -94,7 +94,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
             else:
                 if temp == 0:
                     #Create Title
-                    text("Maze Game",10,[0,0],white,screen,[width,height])
+                    text("Maze Game",10,[0,-height/4],white,screen,[width,height])
                     time.sleep(0.1)
                 progress_bar(width/4,temp,screen,[0,height/4],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
                 temp += 1 * delta_time                                  #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
@@ -103,7 +103,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 first_frame = False
                 generated_data = draw_maze([width,height],cube_size,win_pos_x,win_pos_y,screen,maze_data)
                 #Create Maze Title
-                text(title,3,[0,(((len(maze_data) * (cube_size-1))+1)/2)+15],white,screen,[width,height])
+                text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])
                 #Instantiate Player
                 player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],player_pos,True)
                 position_set_to = player_pos
@@ -114,7 +114,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                         ending = False
                     screen.fill(default)
                     text("Maze Completed",5,[0,0],white,screen,[width,height])
-                    text("#",5,[0,50],white,screen,[width,height])
+                    text("#",5,[0,-50],white,screen,[width,height])
                     if time_to_close < 0:
                         to_return = True
                         running = False
@@ -134,7 +134,7 @@ def won(player_pos,win_pos_x,win_pos_y): #Compares player position to entered po
     else:
         return False
 
-def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if there is a wall blocking the players way (currently not working)
+def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if there is a wall blocking the players way when they attempt to move
     if move_dir == "":
         return True
     dict_one = {
@@ -213,7 +213,7 @@ def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws e
                 if character_data[(y*int(len(character_data)/5))+x] == 0:
                     pass
                 else:
-                    draw_rectangle([(-text_width/2)+offsetx+offset_character+(offset[0]*-1),(-text_height/2)+offsety+(offset[1]*-1)],text_size,text_size,True,colour,screen,window_dimensions)
+                    draw_rectangle([(-text_width/2)+offsetx+offset_character+(offset[0]),(-text_height/2)+offsety+(offset[1])],text_size,text_size,True,colour,screen,window_dimensions)
                 offsetx += text_size
             offsety += text_size
             offsetx = 0
