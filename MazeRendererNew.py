@@ -23,7 +23,7 @@ with open('font.txt') as f:
 def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_data):
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
     if cube_size < 3: cube_size = 3 
-    pygame.init()
+    #pygame.init()
     screen = pygame.display.set_mode((width,height), pygame.FULLSCREEN)
     pygame.display.set_caption(title)
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
@@ -37,6 +37,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     position_set_to = [1,0]
     move_dir = ""
     player_pos = start_pos
+    active_last_frame = True
     check_walls = True
     to_return = False
     ending = True
@@ -51,16 +52,16 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT or event.key == pygame.key.key_code("a"):
                     add_to_x = -1
                     move_dir = "left"
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.key.key_code("d"):
                     add_to_x = 1
                     move_dir = "right"
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.key.key_code("w"):
                     add_to_y = -1
                     move_dir = "up"
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.key.key_code("s"):
                     add_to_y = 1
                     move_dir = "down"
                 else:
@@ -122,8 +123,12 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                         time_to_close -= delta_time
                 else:
                     player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
-        pygame.display.flip()                                                                                                                                                                
+        pygame.display.flip()  
+        if(pygame.display.get_active() and active_last_frame == False):
+            generated_data = draw_maze([width,height],cube_size,win_pos_x,win_pos_y,screen,maze_data)
+            text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])                                                                                                                                                                 
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
+        active_last_frame = pygame.display.get_active()
     pygame.quit()
     return to_return
         

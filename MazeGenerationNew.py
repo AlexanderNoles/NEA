@@ -34,54 +34,50 @@ def generate_walled_maze(width,height,max_weight):
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
     return maze_array
 
-def generate_circular_maze(width,height,max_weight):
-    start_time = time.time()
+def generate_diamond_maze(width,height,max_weight):
     weight_group_array = []
     for x in range(0,width):
         weight_group_array.append([])
         for y in range(0,height):
             weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])
-    #Manipulate the weight group array to make the algorithim generate a circular maze with random gaps in the walls
-    center_coords = [int(width/2),int(height/2)]
-    weight_group_array[center_coords[0]][center_coords[1]] = [1,1,1,1,0]
-    weight_to_change_to = 2
-    dir_list = [[-1,0],[0,1],[1,0],[0,-1]]
-    move_dir_dict = {
-        0:[0,1],
-        1:[1,0],
-        2:[0,-1],
-        3:[-1,0]
+    #Manipulate the weight group array to make the algorithim generate a diamond maze with random gaps in the walls
+    center_of_maze = [int(width/2),int(height/2)]
+    pos_to_change = center_of_maze
+    counter = 1
+    circling = True
+    translate_to_displacement = {   #Highest chance of being wrong
+        1:[0,1],
+        2:[1,0],
+        3:[0,-1],
+        0:[-1,0]
         }
-    start_side_list = [1,3,0,2]
-    for i in range(0,4):
-        new_pos = (center_coords[0] + dir_list[i][0], center_coords[1]+dir_list[i][1])
-        circiling = True
-        move_amount = 2
-        index = 0 + i 
-        current_pos = new_pos
-        while circiling:
-            try:
-                start_pos = current_pos
-                side_to_remove = start_side_list[index]
-                move_dir = move_dir_dict[index]               
-                for j in range(0,move_amount+1):
-                    current_pos = [start_pos[0]+(move_dir[0]*j),start_pos[1]+(move_dir[1]*j)]
-                    if current_pos[0] < 0 or current_pos[1] < 0:
-                        current_pos[len(current_pos)+2] = "error" #Intentionally cause an index error
-                    weight_group_array[current_pos[0]][current_pos[1]][side_to_remove] = weight_to_change_to                    
-                    if weight_to_change_to != max_weight:
-                        weight_to_change_to += 1               
-                move_amount += 2
-                index += 1
-                if index > (len(start_side_list)-1):
-                    index = 0                
-            except IndexError:
-                circiling = False
-    #print(time.time() - start_time)    
+    translate_to_wall_index = {
+        1:2,
+        2:1,
+        3:3,
+        0:0
+        }
+    while circling:
+        modded_counter = counter % 4
+        displacement = translate_to_displacement[modded_counter]
+        wall_index = int(translate_to_wall_index[modded_counter])
+        length_counter = counter // 2 + (counter % 2)
+        for i in range(1,length_counter):
+            #Check to see if current cell is within maze
+            if pos_to_change[0] > width-1 or pos_to_change[1] > height-1:
+                pass
+            else:
+                #If it is then remove the wall leading to the new cell
+                weight_group_array[pos_to_change[0]][pos_to_change[1]][wall_index] = counter
+            #Move into the new cell
+            pos_to_change = [pos_to_change[0]+displacement[0],pos_to_change[1]+displacement[1]]
+        counter += 1
+        #Fail state check
+        if pos_to_change[0] > width and pos_to_change[1] > height:
+            circling = False
+    weight_group_array[center_of_maze[0]][center_of_maze[1]] = [0,0,0,0,1] #Remove all walls from center
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
-    #print(time.time() - start_time) 
-    return maze_array
-    
+    return maze_array 
 
 def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based on the algorithim as described in "Mazes for Programmers"
     maze_array = intialize_array(width,height)
@@ -171,6 +167,6 @@ def lowest_values_pos(wg_array,width,height,compared_to):   #Finds all the conne
 def main(width,height,max_weight,maze_type):
     if maze_type == "normal":
         maze_data = generate_walled_maze(width,height,max_weight)
-    elif maze_type == "circular":
-        maze_data = generate_circular_maze(width,height,max_weight)
+    elif maze_type == "diamond":
+        maze_data = generate_diamond_maze(width,height,max_weight)
     return maze_data

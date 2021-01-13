@@ -1,2 +1,3 @@
 - Fixed maze generation taking a long time (weight issue)
 - Fixed wall detection not working (actually a rendering issue)
+- Fixed maze not being there if player tabs out and tabs back in
