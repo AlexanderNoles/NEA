@@ -75,7 +75,7 @@ def generate_diamond_maze(width,height,max_weight):
         #Fail state check
         if pos_to_change[0] > width and pos_to_change[1] > height:
             circling = False
-    weight_group_array[center_of_maze[0]][center_of_maze[1]] = [0,0,0,0,1] #Remove all walls from center
+    weight_group_array[center_of_maze[0]][center_of_maze[1]] = [0,0,0,0,0] #Remove all walls from center
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
     return maze_array 
 
@@ -83,7 +83,7 @@ def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based on t
     maze_array = intialize_array(width,height)
     group_designation = 1                                                                                                                                           
     temp_list_empty = False
-    while not all_in_one_group(weight_group_array,height,width) or not temp_list_empty: #Only ends loop when no new corridors can be checked and all the corriders are in the same group
+    while not all_in_one_group(weight_group_array,height,width) and not temp_list_empty: #Only ends loop when no new corridors can be checked and all the corriders are in the same group0
         temp_list = lowest_values_pos(weight_group_array,width,height,max_weight+1)
         if temp_list == []:
             temp_list_empty = True
@@ -148,7 +148,7 @@ def all_in_one_group(wg_array,height,width):    #Checks to see if every cell is 
             if first_group == "null":
                 first_group = temp
             if temp != first_group or temp == 0:
-                returned = False
+                returned = False                
     return returned
 
 def lowest_values_pos(wg_array,width,height,compared_to):   #Finds all the connections in the maze with the lowest weight value

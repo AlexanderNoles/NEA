@@ -1,3 +1,6 @@
 - Fixed maze generation taking a long time (weight issue)
 - Fixed wall detection not working (actually a rendering issue)
 - Fixed maze not being there if player tabs out and tabs back in
+- When removing walls from center of diamond maze, group for center cell was accidentally set to
+an actual group rather than the null/default group of 0. This lead to some mazes, where you
+had to travel through the middle, unsolvable.

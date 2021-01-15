@@ -27,7 +27,7 @@ screen_height = user32.GetSystemMetrics(1)
 
 user_id = 0
 
-number_of_mazes = 2
+number_of_mazes = 2 #CONSTANT
 
 #CREATE
 def change_state(state,*args):
@@ -197,11 +197,12 @@ FOREIGN KEY (user_id) REFERENCES users (id)
     if connection is not None:
         create_table(connection,user_table)
         create_table(connection,completed_levels_table)
+        create_new_user(connection,"Example_User")
     else:
         print("Database Connection Error")
 
 def create_new_user(connection, username):
-    new_user_sql = ''' INSERT INTO user(username) VALUES(?)'''
+    new_user_sql = 'INSERT INTO users(username) VALUES(?)'
     cursor = connection.cursor()
     cursor.execute(new_user_sql,username)
     connection.commit()
@@ -224,7 +225,7 @@ def create_table(connection, create_table):
     except Error as e:
         print(e)
         
-main_database()
+#main_database()
 
 #OTHER
 def load_completed_levels():

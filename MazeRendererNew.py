@@ -41,6 +41,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     check_walls = True
     to_return = False
     ending = True
+    drawing_per_frame = True
     while running:
         #Anything in this loop is run every frame (Equivalent to Unity's update() function)
         start_time = time.time() #For measuring execution time it is used for debug, testing program speed and the calculation of delta_time  
@@ -102,19 +103,23 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
         elif not loading:                                               #the progress bar would have to be called from the MazeGenerationNew script)
             if first_frame == True:                
                 first_frame = False
-                generated_data = draw_maze([width,height],cube_size,win_pos_x,win_pos_y,screen,maze_data)
+                if drawing_per_frame:
+                    maze_width = (len(maze_data) * (cube_size-1))+1
+                    maze_height = (len(maze_data[0]) * (cube_size-1))+1
+                    x = 0
+                    y = 0
                 #Create Maze Title
                 text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])
                 #Instantiate Player
-                player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],player_pos,True)
-                position_set_to = player_pos
+                player_pos = draw_player(maze_data,maze_width,maze_height,cube_size,screen,[width,height],player_pos,True)
+                position_set_to = player_pos            
             else:
                 if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):
                     if ending:
                         time.sleep(0.4) #Halts the game for a very short amount of time to make the transition to the end screen smoother
                         ending = False
                     screen.fill(default)
-                    text("Maze Completed",5,[0,0],white,screen,[width,height])
+                    text("Maze Completed",10,[0,0],white,screen,[width,height])
                     text("#",5,[0,-50],white,screen,[width,height])
                     if time_to_close < 0:
                         to_return = True
@@ -122,7 +127,15 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                     else:
                         time_to_close -= delta_time
                 else:
-                    player_pos = draw_player(maze_data,generated_data[0],generated_data[1],cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
+                    if drawing_per_frame:
+                        draw_maze_per_cell([maze_height,maze_width], [x,y], [width,height], cube_size, [win_pos_x,win_pos_y], screen, maze_data)
+                        x += 1
+                        if x == len(maze_data[y]):
+                            x = 0
+                            y += 1
+                        if y == len(maze_data):
+                            drawing_per_frame = False
+                    player_pos = draw_player(maze_data,maze_width,maze_height,cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
         pygame.display.flip()  
         if(pygame.display.get_active() and active_last_frame == False):
             generated_data = draw_maze([width,height],cube_size,win_pos_x,win_pos_y,screen,maze_data)
@@ -154,21 +167,12 @@ def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if th
         return False
 
 #RENDERING
-def draw_maze(window_dimensions,cube_size,win_pos_x,win_pos_y,screen,maze_data): #This function will draw a maze based on maze data generated in the maze generation script
-    #Content of maze#
-    maze_width = (len(maze_data) * (cube_size-1))+1 #Calculates the dimensions of the maze, taking into account the fact the squares overlap
-    maze_height = (len(maze_data[0]) * (cube_size-1))+1    
-    offsety = 0
-    offsetx = 0
-    for y in range(0,len(maze_data)):
-        for x in range(0, len(maze_data[y])):
-            draw_rectangle([(0-(maze_height/2)+offsetx),((0-maze_width/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[y][x])
-            if won([x,y],win_pos_x,win_pos_y):
-                draw_rectangle([(0-(maze_height/2)+offsetx+2),((0-maze_width/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
-            offsetx += cube_size-1    
-        offsety += cube_size-1
-        offsetx = 0
-    return [maze_width,maze_height]
+def draw_maze_per_cell(maze_dimensions, coords_to_draw, window_dimensions, cube_size, win_pos, screen, maze_data):
+    offsetx = coords_to_draw[0] * (cube_size-1)
+    offsety = coords_to_draw[1] * (cube_size-1)
+    draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[coords_to_draw[1]][coords_to_draw[0]])
+    if won([coords_to_draw[0],coords_to_draw[1]],win_pos[0],win_pos[1]):
+        draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions) 
 
 def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args): #Draws the player in the center of a square, indicated by x and y coordinates
     player_size = cube_size * 0.6
