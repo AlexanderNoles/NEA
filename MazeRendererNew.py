@@ -25,7 +25,6 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     if cube_size < 3: cube_size = 3 
     #pygame.init()
     screen = pygame.display.set_mode((width,height), pygame.FULLSCREEN)
-    pygame.display.set_caption(title)
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
     time_to_close = 1.5
