@@ -1,7 +1,5 @@
 import time     
-import os                   #Used to hide the initial pygame console output
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-import pygame               #Used to draw pixels on the screen in a window
+import Window
 
 #VARIABLES
 #colours
@@ -24,7 +22,11 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
     if cube_size < 3: cube_size = 3 
     #pygame.init()
-    screen = pygame.display.set_mode((width,height), pygame.FULLSCREEN)
+    screen = Window.Window(height,width,0,"Test Window")
+    screen.set_fullscreen(True)
+    screen.init_input()
+    screen.reset()
+    screen.update()
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
     time_to_close = 1.5
@@ -40,34 +42,31 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     check_walls = True
     to_return = False
     ending = True
-    drawing_per_frame = True
+    drawing_per_frame = False
+    input_confirmed = False
+    input_delay = 0
     while running:
         #Anything in this loop is run every frame (Equivalent to Unity's update() function)
-        start_time = time.time() #For measuring execution time it is used for debug, testing program speed and the calculation of delta_time  
-        for event in pygame.event.get():            
-            #Makes program stop when user closes the window or presses "esc"
-            if event.type == pygame.QUIT:
-                running = False
-            #Checks if the player has pressed a move button (and which one it was) this frame or if the player has pressed the escape key
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+        start_time = time.time() #For measuring execution time, it is used for debug, testing program speed and the calculation of delta_time
+        #Input
+        if input_delay <= 0:
+            if screen.last_key_pressed != None and input_confirmed:
+                if screen.last_key_pressed == 'esc':
                     running = False
-                if event.key == pygame.K_LEFT or event.key == pygame.key.key_code("a"):
+                if screen.last_key_pressed == 'a':
                     add_to_x = -1
                     move_dir = "left"
-                elif event.key == pygame.K_RIGHT or event.key == pygame.key.key_code("d"):
+                elif screen.last_key_pressed == 'd':
                     add_to_x = 1
                     move_dir = "right"
-                elif event.key == pygame.K_UP or event.key == pygame.key.key_code("w"):
+                elif screen.last_key_pressed == 'w':
                     add_to_y = -1
                     move_dir = "up"
-                elif event.key == pygame.K_DOWN or event.key == pygame.key.key_code("s"):
+                elif screen.last_key_pressed == 's':
                     add_to_y = 1
                     move_dir = "down"
                 else:
                     move_dir = ""
-                if event.key == pygame.K_e:
-                    print(player_pos)
                 #Checks to make sure player can't go outside the maze
                 if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0])-1:
                     add_to_x = 0
@@ -80,10 +79,15 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                     add_to_y = 0
                     add_to_x = 0
                 check_walls = True
+                input_confirmed = False
             else:
                 position_set_to = player_pos
                 add_to_y = 0
                 add_to_x = 0
+                input_confirmed = True
+                input_delay = 0.01         #The time between moves
+        else:
+            input_delay -= delta_time
         #Game Code
         if debug:
             print(str(round((time.time() - start_time)*1000,1)) + "ms") #Prints execution time (per frame) to console
@@ -91,7 +95,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
         if loading:
             if temp >= 1:
                 loading = False
-                screen.fill(default)
+                screen.reset()
             else:
                 if temp == 0:
                     #Create Title
@@ -101,10 +105,10 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 temp += 1 * delta_time                                  #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
         elif not loading:                                               #the progress bar would have to be called from the MazeGenerationNew script)
             if first_frame == True:                
-                first_frame = False
+                first_frame = False            
+                maze_width = (len(maze_data) * (cube_size-1))+1
+                maze_height = (len(maze_data[0]) * (cube_size-1))+1
                 if drawing_per_frame:
-                    maze_width = (len(maze_data) * (cube_size-1))+1
-                    maze_height = (len(maze_data[0]) * (cube_size-1))+1
                     x = 0
                     y = 0
                 #Create Maze Title
@@ -117,7 +121,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                     if ending:
                         time.sleep(0.4) #Halts the game for a very short amount of time to make the transition to the end screen smoother
                         ending = False
-                    screen.fill(default)
+                    screen.reset()
                     text("Maze Completed",10,[0,0],white,screen,[width,height])
                     text("#",5,[0,-50],white,screen,[width,height])
                     if time_to_close < 0:
@@ -134,14 +138,12 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                             y += 1
                         if y == len(maze_data):
                             drawing_per_frame = False
+                    else:
+                        draw_maze([maze_height,maze_width],[width,height], cube_size,[win_pos_x,win_pos_y], screen, maze_data)
                     player_pos = draw_player(maze_data,maze_width,maze_height,cube_size,screen,[width,height],[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],False,player_pos)
-        pygame.display.flip()  
-        if(pygame.display.get_active() and active_last_frame == False):
-            generated_data = draw_maze([width,height],cube_size,win_pos_x,win_pos_y,screen,maze_data)
-            text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])                                                                                                                                                                 
+        screen.update()                                                                                                                                                                 
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
-        active_last_frame = pygame.display.get_active()
-    pygame.quit()
+    screen.quit()
     return to_return
         
 #CHECKS
@@ -171,7 +173,20 @@ def draw_maze_per_cell(maze_dimensions, coords_to_draw, window_dimensions, cube_
     offsety = coords_to_draw[1] * (cube_size-1)
     draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[coords_to_draw[1]][coords_to_draw[0]])
     if won([coords_to_draw[0],coords_to_draw[1]],win_pos[0],win_pos[1]):
-        draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions) 
+        draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
+
+def draw_maze(maze_dimensions, window_dimensions, cube_size, win_pos, screen, maze_data):
+    offsetx = 0
+    offsety = 0
+    for y in range(0,len(maze_data)):
+        for x in range(0,len(maze_data[y])):
+            draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[y][x])
+            if won([x,y],win_pos[0],win_pos[1]):
+                draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
+            offsetx += cube_size-1
+        offsety += cube_size-1
+        offsetx = 0
+    
 
 def draw_player(maze_data,maze_height,maze_width,cube_size,screen,window_dimensions,new_pos,first_pos,*args): #Draws the player in the center of a square, indicated by x and y coordinates
     player_size = cube_size * 0.6
@@ -236,7 +251,7 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
     if fill:
         for x in range(startpos[0],startpos[0]+width):
             for y in range(startpos[1],startpos[1]+height):
-                screen.set_at((x,y),colour)
+                screen.set_pixel([x,y],colour)
     if not fill:
         list_one = []
         if isinstance(args[0], int):
@@ -249,7 +264,7 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
                 if (x in range(startpos[0]+list_one[0],startpos[0]+width-list_one[1])) and (y in range(startpos[1]+list_one[2],startpos[1]+height-list_one[3])):
                     pass
                 else:
-                    screen.set_at((x,y),colour)
+                    screen.set_pixel([x,y],colour)
 
 #CONVERTORS
 def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts x and y coords to pixel measurments so that the player can be properly positioned 

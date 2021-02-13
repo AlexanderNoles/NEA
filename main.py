@@ -143,7 +143,8 @@ def load_maze(lower,upper,title,maze_type,index,btn):
         win_pos_x = (dict_two[maze_type])[0]
         win_pos_y = (dict_two[maze_type])[1]
         start_pos = (dict_two[maze_type])[2]
-        won = play_maze(screen_width,screen_height,(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
+        dimensions = alter_screen_based_on_maze()
+        won = play_maze(dimensions[0],dimensions[1],(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
     else:
         won = True
     if won:
@@ -229,7 +230,7 @@ def create_table(connection, create_table):
 
 #OTHER
 def load_completed_levels():
-    #Loads the completed levels based on the file (the location of which is stored in the stats database) linked to the user id
+    #Loads the completed levels based on the list stored in the maze database, it will be linked to the user id
     return []
   
 def des(): #Deletes all current widgets in "window"
@@ -244,7 +245,14 @@ def all_children(window): # This makes a list of all the widgets
             list_one.extend(item.winfo_children())
     return list_one
 
+def alter_screen_based_on_maze():
+    const = 2
+    dimensions = [0,0]
+    dimensions[0] = int(screen_width/const)
+    dimensions[1] = int(screen_height/const)
+    return dimensions
+
 if __name__ == "__main__":
     change_state(default_state)
     
-#window.mainloop()
+window.mainloop()
