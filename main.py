@@ -6,7 +6,7 @@ from MazeGenerationNew import main
 try:
     from MazeRendererNew import play_maze
     installed = True
-except ImportError: #Pygame is not installed
+except ImportError: #PIL is not installed
     installed = False
     
 window = tk.Tk()
@@ -33,11 +33,11 @@ number_of_mazes = 2 #CONSTANT
 def change_state(state,*args):
     des()
     if state == "start":
-        title = tk.Label(window, text = "\n Maze Game \n Version 1.2 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
+        title = tk.Label(window, text = "\n Maze Game \n Version 2.0 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
         enter_button = tk.Button(window, text = "Enter",bg = "white",width=30, command = lambda: change_state("username")).pack()
         exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=3)
         if not installed:
-            error_message = tk.Label(window,text="[Pygame not installed, Pygame is required for current version]",fg="red").pack(side="bottom",pady = 20)
+            error_message = tk.Label(window,text="[PIL not installed, PIL is required for current version]",fg="red").pack(side="bottom",pady = 20)
     if state == "username":
         title = tk.Label(window, text = "\n Accounts \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         top_seperator = tk.Canvas(window, height=50,width=0).pack()       
@@ -107,9 +107,8 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
                 "normal":0,
                 "diamond":1
                 }
-    for i in range((lower),(upper+2)):
-        text = str(i) 
-        if i != upper+1:                  
+    for i in range((lower),(upper+1)):
+            text = str(i)                          
             try:
                 if lines[dict_one[maze_type]].count(text) > 0:
                     fg = "green"
@@ -125,10 +124,6 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
                 middle = tk.Frame(window)
                 middle.pack(side = "top")
                 side = middle
-        else:
-            button = tk.Button(window, text=text, width = 10, relief = 'groove', bg = "white",fg = "red")
-            button.config(command = lambda mt = maze_type, btn = button : load_maze(lower,upper,title,mt,dict_one[maze_type],btn))
-            button.pack(padx=10,pady=10)
     back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
 #BUTTONS   
@@ -143,7 +138,7 @@ def load_maze(lower,upper,title,maze_type,index,btn):
         win_pos_x = (dict_two[maze_type])[0]
         win_pos_y = (dict_two[maze_type])[1]
         start_pos = (dict_two[maze_type])[2]
-        dimensions = alter_screen_based_on_maze()
+        dimensions = alter_screen()
         won = play_maze(dimensions[0],dimensions[1],(str(maze_size) + " x " + str(maze_size)),10,win_pos_x,win_pos_y,start_pos,maze_data)
     else:
         won = True
@@ -154,13 +149,14 @@ def load_maze(lower,upper,title,maze_type,index,btn):
     create_levels(lower,upper,4,title,maze_type,lines)
 
 def custom_maze(maze_type,width,height,cube_size,title):
-    try:
+    #try:
         width = int(width.get())
         height = int(height.get())
         cube_size = int(cube_size.get())
         maze_data = main(width,height,1000,maze_type.get())
-        play_maze(screen_width,screen_height,(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
-    except:
+        dimensions = alter_screen()
+        play_maze(dimensions[0],dimensions[1],(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
+    #except:
         change_state('custom maze',True)
 
 def set_user_id(username,guest):    
@@ -245,7 +241,7 @@ def all_children(window): # This makes a list of all the widgets
             list_one.extend(item.winfo_children())
     return list_one
 
-def alter_screen_based_on_maze():
+def alter_screen():
     const = 2
     dimensions = [0,0]
     dimensions[0] = int(screen_width/const)

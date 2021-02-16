@@ -8,8 +8,8 @@ class Window():
     layers = []
 
     def __init__(self, height, width, default_colour, title):   #Creates the intial image and sets intial values
-        self.height = height
-        self.width = width
+        self.height = int(height)
+        self.width = int(width)
         self.title = title
         self.default_colour = default_colour
         self.window = create_tkinter_window(self.height, self.width, self.title)
@@ -24,11 +24,20 @@ class Window():
             self.default_colour = default_colour
             self.layer_num = len(window.layers)
             self.array = create_image_array(height,width,default_colour)
-            generated_image = ImageTk.PhotoImage(master = window.screen,image=Image.fromarray(self.array))
-            self.image = window.screen.create_image(width/2,height/2,image=generated_image)
+            self.generated_image = ImageTk.PhotoImage(master = window.screen,image=Image.fromarray(self.array))
+            self.image = window.screen.create_image(width,height,image=self.generated_image)
 
-    def move_layer(self,coords,layer_num = 0):  #Moves a layer to a given position
-        self.screen.move(self.layers[layer_num].image,coords[0],coords[1])
+    def move_layer(self,new_coords,layer_num = 0):  #Moves a layer to a given position
+        #Get Current Top Left of layer Coords
+        old_coords = self.screen.coords(self.layers[layer_num].image)
+        old_coords[0] = old_coords[0] - (self.layers[layer_num].height/2)
+        old_coords[1] = old_coords[1] - (self.layers[layer_num].width/2)
+        #Move to new position
+        self.screen.move(self.layers[layer_num].image,new_coords[0] - old_coords[0],new_coords[1] - old_coords[1])
+
+    def delete_layer(self,layer):
+        self.screen.delete(self.layers[layer].image)
+        self.layers.pop(layer)       
 
     def init_input(self):
         def on_key_press(event):
@@ -45,8 +54,8 @@ class Window():
 
     def update(self, layer_num = 0):   #Updates an entered layer
         try:
-            generated_image = ImageTk.PhotoImage(master = self.screen,image=Image.fromarray(self.layers[layer_num].array)) #Generate a updated image from the image array
-            self.screen.itemconfig(self.layers[layer_num].image, image = generated_image)
+            self.layers[layer_num].generated_image = ImageTk.PhotoImage(master = self.screen,image=Image.fromarray(self.layers[layer_num].array)) #Generate a updated image from the image array
+            self.screen.itemconfig(self.layers[layer_num].image, image = self.layers[layer_num].generated_image)
         except IndexError:
             print("Invalid Layer")
         self.window.update()
@@ -66,8 +75,9 @@ class Window():
         self.window.overrideredirect(False)
         self.window.attributes('-fullscreen',boolean)
         self.screen.pack(fill="both", expand=True)
-        for i in range(0,len(self.layers)):
-            self.screen.move(self.layers[i].image,self.width/2,self.height/2)
+        #for i in range(1,len(self.layers)):
+            #self.screen.move(self.layers[i].image,self.width,self.height)
+            #self.move_layer([self.width,self.height],i)
 
     def set_pixel_scale(self, num): #Used to change the pixel scale
         self.pixel_scale = num
@@ -93,6 +103,18 @@ def create_image_array(height,width,colour): #Creates the intial image array
     image_array.fill(colour)
     return image_array
 
-#window = Window(1000,1000,0,"Bruh")
+
+#import ctypes
+#user32 = ctypes.windll.user32
+#screen_width = user32.GetSystemMetrics(0)
+#screen_height = user32.GetSystemMetrics(1)
+#window = Window(screen_height/2,screen_width/2,95,"Cringe")
+#window.set_fullscreen(True)
+#window.update()
+#window.layers.append(window.Layer(window,100,100,255))
+#window.update(layer_num = 1)
+#while True:
+    #window.move_layer([10,10],layer_num = 1)
+    #window.update(layer_num=1)
 
 
