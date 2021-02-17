@@ -57,10 +57,13 @@ def change_state(state,*args):
         enter_button = tk.Button(window, text = "Enter",bg = "white",width=10, command = lambda u = username_entry: new_user(u)).pack(pady = 10)
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)  
     elif state == "maze select":
+        if user_id != 0:
+            completed = Db.get_list_of_completed_levels(connection,user_id)
+        else:
+            completed = [[],[]]
         title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
-        lines = load_completed_levels()
-        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,32,4,"Normal Maze","normal",lines)).pack(pady=(50,10))
-        circular_maze_button = tk.Button(window, text = "\n Diamond Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,32,4,"Diamond Maze","diamond",lines)).pack(pady=10)
+        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,32,4,"Normal Maze","normal",completed)).pack(pady=(50,10))
+        circular_maze_button = tk.Button(window, text = "\n Diamond Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,32,4,"Diamond Maze","diamond",completed)).pack(pady=10)
         custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze",False)).pack(pady=10)
         reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)        
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)      
@@ -98,7 +101,7 @@ def change_state(state,*args):
             #error_label = tk.Label(window, text = "Invalid Entry", fg = "red").pack()
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
-def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create a number of ordered buttons
+def create_levels(lower,upper,number_of_columns,title,maze_type,completed): #create a number of ordered buttons
     des()
     first = tk.Frame(window)
     first.pack(side='top')
@@ -112,7 +115,7 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,lines): #create 
     for i in range((lower),(upper+1)):
             text = str(i)                          
             try:
-                if lines[dict_one[maze_type]].count(text) > 0:
+                if completed[dict_one[maze_type]].count(text) > 0:
                     fg = "green"
                     text += "\n(Complete)"
                 else:
@@ -146,9 +149,9 @@ def load_maze(lower,upper,title,maze_type,index,btn):
         won = True
     if won:
         if user_id != 0:
-            Db.add_completed_level(connection,maze_size-3, maze_type)
-    lines = load_completed_levels()
-    create_levels(lower,upper,4,title,maze_type,lines)
+            Db.add_completed_level(connection,maze_size-3, maze_type,user_id)
+    completed = Db.get_list_of_completed_levels(connection,user_id)
+    create_levels(lower,upper,4,title,maze_type,completed)
 
 def custom_maze(maze_type,width,height,cube_size,title):
     #try:
@@ -170,7 +173,9 @@ def set_user_id(username,guest):
     change_state("maze select")
 
 def reset_progress():
-    pass
+    username = Db.delete_user(connection, user_id)
+    Db.create_new_user(connection, username)
+    change_state("maze select")
 
 #DATABASE IMPLEMENTATION
 def new_user(user_entry_widget):
@@ -178,11 +183,7 @@ def new_user(user_entry_widget):
     Db.create_new_user(connection,name)
     change_state("username")
 
-#OTHER
-def load_completed_levels():
-    #Loads the completed levels based on the list stored in the maze database, it will be linked to the user id
-    return []
-  
+#OTHER  
 def des(): #Deletes all current widgets in "window"
     widget_list = all_children(window)
     for item in widget_list:

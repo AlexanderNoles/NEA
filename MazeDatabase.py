@@ -6,7 +6,7 @@ from sqlite3 import Error
 #CompletedLevels table stores the completed levels linked to the foreign key user_id and a primary key completed_id. There will be two columns, one for normal mazes, one for diamond mazes
 #the completed levels will be serialized as such (1#3#4#12...) and when the string is imported it will be split into a list.
 
-def main_database():
+def main_database():    #Creates the database (if it wasn't already created) and establishes a connection to it 
     user_table = """ CREATE TABLE IF NOT EXISTS users (
 id integer PRIMARY KEY,
 username text NOT NULL
@@ -40,7 +40,21 @@ def create_new_user(connection, username):
     connection.commit()
 
 def delete_user(connection, user_id):
-    pass
+    sql = 'SELECT username FROM users WHERE id = ?'
+    cursor = connection.cursor()
+    cursor.execute(sql, (user_id))
+    result = cursor.fetchall()
+    #Delete user entry
+    sql = 'DELETE FROM users WHERE id=?'
+    cursor = connection.cursor()
+    cursor.execute(sql, (user_id))
+    connection.commit()
+    #Delete completedLevels entry
+    sql = 'DELETE FROM completedLevels WHERE user_id=?'
+    cursor = connection.cursor()
+    cursor.execute(sql, (user_id))
+    connection.commit()
+    return result[0][0]
 
 def get_list_of_users(connection):
     user_list = []
@@ -51,12 +65,30 @@ def get_list_of_users(connection):
         user_list.append((str(row)[1:-1]).split(','))
     return user_list
 
-def add_completed_level(connection,level_number,maze_type, user_id):    #Uses the user id to alter the user's completed levels
-    pass
+def add_completed_level(connection, level_number, maze_type, user_id):    #Uses the user id to alter the user's completed levels
+    completed = get_list_of_completed_levels(connection, user_id)
+    dict_one = {
+                "normal":0,
+                "diamond":1
+                }
+    formatted = ''
+    for level_num in completed[dict_one[maze_type]]:
+        print(level_num)
+        formatted = formatted + level_num + "#"
+    formatted = formatted + str(level_number)
+    if maze_type == "normal":
+        sql = "UPDATE completedLevels SET normal_maze = ? WHERE user_id = ?"
+    elif maze_type == "diamond":
+        sql = "UPDATE completedLevels SET diamond_maze = ? WHERE user_id = ?"
+    cursor = connection.cursor()
+    cursor.execute(sql,(formatted,user_id))
 
 def get_list_of_completed_levels(connection, user_id):
-    pass
-
+    maze_find_sql = "SELECT normal_maze, diamond_maze FROM completedLevels WHERE user_id = ?"
+    cursor = connection.cursor()
+    cursor.execute(maze_find_sql,(user_id))
+    result = cursor.fetchall()
+    return [(result[0][0]).split('#'),(result[0][1]).split('#')]
             
 def create_connection(db_file):
     connection = None
@@ -72,5 +104,3 @@ def create_table(connection, create_table):
         cursor.execute(create_table)
     except Error as e:
         print(e)
-        
-#main_database()
