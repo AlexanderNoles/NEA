@@ -5,17 +5,17 @@ from PIL import ImageTk, Image
 class Window():
     pixel_scale = 1
     last_key_pressed = None
-    layers = []
-
+    
     def __init__(self, height, width, default_colour, title):   #Creates the intial image and sets intial values
         self.height = int(height)
         self.width = int(width)
         self.title = title
         self.default_colour = default_colour
         self.window = create_tkinter_window(self.height, self.width, self.title)
-        self.screen = create_canvas(self.window)         
+        self.screen = create_canvas(self.window)
+        self.layers = []
         self.layers.append(self.Layer(self,self.height,self.width,self.default_colour)) #Create the background layer
-
+        
     class Layer():  #Layer Objects
 
         def __init__(self,window,height,width,default_colour):
@@ -83,6 +83,8 @@ class Window():
         self.pixel_scale = num
 
     def quit(self):
+        for i in range(0,len(self.layers)):
+            self.reset(i)
         self.window.destroy()
         del self
 

@@ -21,14 +21,13 @@ with open('font.txt') as f:
 def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_data):
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
     if cube_size < 3: cube_size = 3 
-    #pygame.init()
     screen = Window.Window(height,width,0,"Test Window")
     screen.set_fullscreen(True)
     screen.init_input()
-    screen.reset()
     screen.update()
     temp = 0 #Temporary Variable to manage progress of stand-in progress bar
     delta_time = 0
+    fps = 0
     time_to_close = 1.5
     add_to_y = 0
     add_to_x = 0
@@ -46,8 +45,8 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     input_confirmed = False
     input_delay = 0
     while running:
-        #Anything in this loop is run every frame (Equivalent to Unity's update() function)
-        start_time = time.time() #For measuring execution time, it is used for debug, testing program speed and the calculation of delta_time
+        #Anything in this loop is run every frame
+        start_time = time.time() #For measuring execution time, it is used for debug, testing program speed and the calculation of delta_time        
         #Input
         if input_delay <= 0:
             if screen.last_key_pressed != None and input_confirmed:
@@ -101,7 +100,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                     #Create Title
                     text("Maze Game",10,[0,-height/4],white,screen,[width,height])
                     time.sleep(0.1)
-                progress_bar(width/4,temp,screen,[0,height/4],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
+                progress_bar(width/2,temp,screen,[0,height/4],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
                 temp += 1 * delta_time                                  #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
         elif not loading:                                               #the progress bar would have to be called from the MazeGenerationNew script)
             if first_frame == True:                
@@ -122,12 +121,12 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
             else:
                 if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):
                     if ending:
-                        time.sleep(0.4) #Halts the game for a very short amount of time to make the transition to the end screen smoother
-                        screen.delete_layer(1)
+                        time.sleep(0.4) #Halts the game for a very short amount of time to make the transition to the end screen feel less abrupt
+                        screen.delete_layer(1) 
+                        screen.reset()                    
+                        text("Maze Completed",10,[0,0],white,screen,[width,height])
+                        text("#",5,[0,-50],white,screen,[width,height])
                         ending = False
-                    screen.reset()                    
-                    text("Maze Completed",10,[0,0],white,screen,[width,height])
-                    text("#",5,[0,-50],white,screen,[width,height])
                     if time_to_close < 0:
                         to_return = True
                         running = False
@@ -145,7 +144,10 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                     player_pos = draw_player(False,cube_size,screen,[player_pos[0]+add_to_x,player_pos[1]+add_to_y],maze_width,maze_height,[width,height])
                     screen.update(layer_num = 1)
         delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
-        #print(delta_time)
+        try:
+            fps = 1/delta_time         
+        except:
+            pass
     screen.quit()
     return to_return
         
