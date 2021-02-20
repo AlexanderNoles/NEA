@@ -39,7 +39,7 @@ class Window():
         self.screen.delete(self.layers[layer].image)
         self.layers.pop(layer)       
 
-    def init_input(self):
+    def init_input(self):                   #Input created using tkinter, last key pressed = key pressed that frame
         def on_key_press(event):
             self.last_key_pressed = event.char
             if self.last_key_pressed == '':
@@ -55,7 +55,7 @@ class Window():
     def update(self, layer_num = 0):   #Updates an entered layer
         try:
             self.layers[layer_num].generated_image = ImageTk.PhotoImage(master = self.screen,image=Image.fromarray(self.layers[layer_num].array)) #Generate a updated image from the image array
-            self.screen.itemconfig(self.layers[layer_num].image, image = self.layers[layer_num].generated_image)
+            self.screen.itemconfig(self.layers[layer_num].image, image = self.layers[layer_num].generated_image)    #Applies the generated image
         except IndexError:
             print("Invalid Layer")
         self.window.update()
@@ -75,14 +75,11 @@ class Window():
         self.window.overrideredirect(False)
         self.window.attributes('-fullscreen',boolean)
         self.screen.pack(fill="both", expand=True)
-        #for i in range(1,len(self.layers)):
-            #self.screen.move(self.layers[i].image,self.width,self.height)
-            #self.move_layer([self.width,self.height],i)
 
     def set_pixel_scale(self, num): #Used to change the pixel scale
         self.pixel_scale = num
 
-    def quit(self):
+    def quit(self):                             #Quits window
         for i in range(0,len(self.layers)):
             self.reset(i)
         self.window.destroy()
@@ -104,19 +101,5 @@ def create_image_array(height,width,colour): #Creates the intial image array
     image_array = np.zeros([height+1,width+1,3],dtype=np.uint8)
     image_array.fill(colour)
     return image_array
-
-
-#import ctypes
-#user32 = ctypes.windll.user32
-#screen_width = user32.GetSystemMetrics(0)
-#screen_height = user32.GetSystemMetrics(1)
-#window = Window(screen_height/2,screen_width/2,95,"Cringe")
-#window.set_fullscreen(True)
-#window.update()
-#window.layers.append(window.Layer(window,100,100,255))
-#window.update(layer_num = 1)
-#while True:
-    #window.move_layer([10,10],layer_num = 1)
-    #window.update(layer_num=1)
 
 

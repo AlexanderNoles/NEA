@@ -15,7 +15,7 @@ def intialize_array(width,height):
             maze_array[x].append([1,1,1,1]) #Add a blank cell with all four walls to create an array that will be altered to generate a maze, this array is the data we return
     return maze_array
 
-def generate_random_walls(height,width):
+def generate_random_walls(height,width):    #Random walls for testing maze renderer
     #Intialize the array
     maze_array = []
     temp_list = [0,0,0,0,0,0,1]
@@ -31,7 +31,7 @@ def generate_walled_maze(width,height,max_weight):
         weight_group_array.append([])
         for y in range(0,height):
             weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])   #Create a "sister" array that stores the weight values and group of each cell
-    maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
+    maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)    #Use the weight array to generate an actual maze
     return maze_array
 
 def generate_diamond_maze(width,height,max_weight):
@@ -45,7 +45,7 @@ def generate_diamond_maze(width,height,max_weight):
     pos_to_change = center_of_maze
     counter = 1
     circling = True
-    translate_to_displacement = {   #Highest chance of being wrong
+    translate_to_displacement = {
         1:[0,1],
         2:[1,0],
         3:[0,-1],
@@ -79,11 +79,11 @@ def generate_diamond_maze(width,height,max_weight):
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
     return maze_array 
 
-def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based on the algorithim as described in "Mazes for Programmers"
+def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based loosely on the algorithim as described in "Mazes for Programmers"
     maze_array = intialize_array(width,height)
     group_designation = 1                                                                                                                                           
     temp_list_empty = False
-    while not all_in_one_group(weight_group_array,height,width) and not temp_list_empty: #Only ends loop when no new corridors can be checked and all the corriders are in the same group0
+    while not all_in_one_group(weight_group_array,height,width) and not temp_list_empty: #Only ends loop when no new corridors can be checked and all the corriders are in the same group
         temp_list = lowest_values_pos(weight_group_array,width,height,max_weight+1)
         if temp_list == []:
             temp_list_empty = True

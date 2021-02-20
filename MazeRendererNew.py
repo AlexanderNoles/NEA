@@ -115,8 +115,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 #Create Maze Title
                 text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])
                 #Instantiate Player
-                player_pos = draw_player(True,cube_size,screen,player_pos,maze_width,maze_height,[width,height])
-                #screen.update(layer_num=1)   
+                player_pos = draw_player(True,cube_size,screen,player_pos,maze_width,maze_height,[width,height])  
                 position_set_to = player_pos            
             else:
                 if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):
@@ -173,14 +172,14 @@ def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if th
         return False
 
 #RENDERING
-def draw_maze_per_cell(maze_dimensions, coords_to_draw, window_dimensions, cube_size, win_pos, screen, maze_data):
+def draw_maze_per_cell(maze_dimensions, coords_to_draw, window_dimensions, cube_size, win_pos, screen, maze_data):  #Draw maze cell per frame
     offsetx = coords_to_draw[0] * (cube_size-1)
     offsety = coords_to_draw[1] * (cube_size-1)
     draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[coords_to_draw[1]][coords_to_draw[0]])
     if won([coords_to_draw[0],coords_to_draw[1]],win_pos[0],win_pos[1]):
         draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
 
-def draw_maze(maze_dimensions, window_dimensions, cube_size, win_pos, screen, maze_data):
+def draw_maze(maze_dimensions, window_dimensions, cube_size, win_pos, screen, maze_data):   #Draw maze all at once
     offsetx = 0
     offsety = 0
     for y in range(0,len(maze_data)):
@@ -221,7 +220,7 @@ def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws e
         "u":20,"U":20,"v":21,"V":21,"w":22,"W":22,"x":23,"X":23,"y":24,"Y":24,
         "z":25,"Z":25," ":26,"1":27,"2":28,"3":29,"4":30,"5":31,"6":32,"7":33,
         "8":34,"9":35,"0":36,"#":37
-        }
+        }   #Maps a line in the text file to a character
     text_list = split(text)
     text_width = 0
     text_height = 5 * text_size
@@ -283,13 +282,13 @@ def alter_coords_to_fit_scale(value,full): #Makes coords relative to the center 
     return int(full + (value*scale))
 
 #OTHER
-def split(word):
+def split(word):                    #Splits a string into characters, used when drawing text
     return [char for char in word]
 
-def split_int(word):
+def split_int(word):                    #Splits a set of ints into characters
     word = word.replace(" ","")
     word = word.replace("\n","")
     return [int(char) for char in word]
 
-def pythag(a,b):                #Intended to be used to help create the circle of visibilty around the player
+def pythag(a,b):                #Intended to be used to help create the circle of visibilty around the player, not actually implemented
     return ((a*a)+(b*b))**0.5
