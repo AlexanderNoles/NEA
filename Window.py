@@ -60,7 +60,7 @@ class Window():
             print("Invalid Layer")
         self.window.update()
 
-    def set_pixel(self, coords, colour, layer_num=0): #Change a pixel in the image array and then update the image accordingly
+    def set_pixel(self, coords, colour, layer_num=0): #Change a pixel in the image array
         coords[0] = (coords[0] * self.pixel_scale) - (self.pixel_scale - 1)
         coords[1] = (coords[1] * self.pixel_scale) - (self.pixel_scale - 1)
         for x in range(coords[0],coords[0]+self.pixel_scale):

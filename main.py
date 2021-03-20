@@ -1,4 +1,6 @@
 import tkinter as tk
+#import sys
+#print('\n'.join(sys.path))
 
 from MazeGenerationNew import main
 import MazeDatabase as Db
@@ -33,7 +35,7 @@ connection = Db.main_database()
 number_of_mazes = 2 #CONSTANT
 
 #CREATE
-def change_state(state,*args):      #Switches the state of the GUI to the one specified. A state is a pre-defined set of GUI, i.e. a main menu
+def change_state(state):      #Switches the state of the GUI to the one specified. A state is a pre-defined set of GUI, i.e. a main menu
     des()
     if state == "start":    #Start Screen
         title = tk.Label(window, text = "\n Maze Game \n Version 2.0 \n", bg = "white", borderwidth=1, relief="groove").pack(fill = "x",pady=(250,20))
@@ -67,7 +69,7 @@ def change_state(state,*args):      #Switches the state of the GUI to the one sp
         title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,32,4,"Normal Maze","normal",completed)).pack(pady=(50,10))
         circular_maze_button = tk.Button(window, text = "\n Diamond Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,32,4,"Diamond Maze","diamond",completed)).pack(pady=10)
-        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze",False)).pack(pady=10)
+        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze")).pack(pady=10)
         reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)        
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)      
     elif state == "custom maze":    #Custom maze creation screen
@@ -99,9 +101,6 @@ def change_state(state,*args):      #Switches the state of the GUI to the one sp
               
         generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white", command = lambda mt = variable, w = width_scale, h = height_scale, c = cs_entry: custom_maze(mt,h,w,c,"CUSTOM MAZE"))
         generate_maze.pack(pady=30)
-        if(args[0]):
-            pass
-            #error_label = tk.Label(window, text = "Invalid Entry", fg = "red").pack()
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
 def create_levels(lower,upper,number_of_columns,title,maze_type,completed): #create a number of ordered buttons to represnt different levels, the level number is then passed to the load_maze function
@@ -126,7 +125,7 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,completed): #cre
             except:
                 fg = "black"
             button = tk.Button(window, text=text, width = 10, relief = 'groove', bg = "white",fg = fg)
-            button.config(command = lambda mt = maze_type, btn = button : load_maze(lower,upper,title,mt,dict_one[maze_type],btn))
+            button.config(command = lambda mt = maze_type, btn = button : load_maze(lower,upper,title,mt,btn))
             button.pack(in_ = side, side = "left", padx=10,pady=10)
             if (i%number_of_columns) == 0:
                 middle = tk.Frame(window)
@@ -135,7 +134,7 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,completed): #cre
     back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
 #BUTTONS   
-def load_maze(lower,upper,title,maze_type,index,btn):   #Generates the maze and then passes the data along with other parameters to the MazeRenderer script
+def load_maze(lower,upper,title,maze_type,btn):   #Generates the maze and then passes the data along with other parameters to the MazeRenderer script
     maze_size = int((btn['text']).replace("\n(Complete)","")) + 3
     if installed:        
         maze_data = main(maze_size,maze_size,1000,maze_type)

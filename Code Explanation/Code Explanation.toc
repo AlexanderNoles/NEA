@@ -1,0 +1,17 @@
+\contentsline {part}{I\hspace {1em}Analysis}{2}{part.1}%
+\contentsline {section}{\numberline {1}Objective Outline}{2}{section.1}%
+\contentsline {section}{\numberline {2}Research}{2}{section.2}%
+\contentsline {section}{\numberline {3}Organization of Solution}{2}{section.3}%
+\contentsline {part}{II\hspace {1em}Documented Design}{3}{part.2}%
+\contentsline {section}{\numberline {4}Program Organization Diagram}{3}{section.4}%
+\contentsline {section}{\numberline {5}Window/Layer Class Diagrams}{4}{section.5}%
+\contentsline {section}{\numberline {6}Maze Select G.U.I}{5}{section.6}%
+\contentsline {section}{\numberline {7}Game Visuals}{8}{section.7}%
+\contentsline {part}{III\hspace {1em}Code Highlights}{10}{part.3}%
+\contentsline {part}{IV\hspace {1em}Code breakdown by function}{11}{part.4}%
+\contentsline {section}{\numberline {8}main.py}{12}{section.8}%
+\contentsline {section}{\numberline {9}MazeDatabase.py}{15}{section.9}%
+\contentsline {section}{\numberline {10}MazeGenerationNew.py}{18}{section.10}%
+\contentsline {section}{\numberline {11}Window.py}{22}{section.11}%
+\contentsline {section}{\numberline {12}MazeRendererNew.py}{25}{section.12}%
+\contentsline {section}{\numberline {13}Required Libraries}{26}{section.13}%
