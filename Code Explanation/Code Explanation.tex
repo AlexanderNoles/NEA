@@ -331,7 +331,7 @@ Select User & 2 & Click on ExampleUser button & user\_id is set to the user id o
 \subsection{Performative Maze Rendering}
 I believe this objective has been met very well, as both "Layer Based Rendering" and the "ablilty to edit any given pixel on a given layer" have been implemented. The program also runs
 at about 2000 frames per second, however, the fps calculation is admittely limited. If the time taken to execute a frame is recorded as 0 then the calcualtion cannot be performed as to avoid
-a zero division error. The code could also be compilied using something such as Cython. This means that the frame rate could be higher, though 2000 frames is certainly enough. The pixels on screen can also be any colour representable in the format (8-bit integer, 8-bit integer,8-bit integer), meaning there are 1,6581,375 possible colours. Currently, the main part of the rendering that could be improved is the dependency on outside packages,
+a zero division error. The code could also be compilied using something such as Cython. This means that the frame rate could be higher, though 2000 frames is certainly enough. The pixels on screen can also be any colour representable in the format (8-bit integer, 8-bit integer,8-bit integer), meaning there are 1,6581,375 possible colours. Currently, the main part of the rendering that could be improved is the dependency on outside libraries,
 specifically Pillow and Numpy.
 
 \subsection{Gameplay Mechanics}
@@ -359,6 +359,8 @@ SQLite3 and I think it does that well.
 \section{Independent Feedback}
 As mentioned in the analysis section due to the covid pandemic I was unable to find a third-party to get feedback from, hence, this section has been skipped.
 \section{Conclusion}
+In conclusion, I believe that my project fufills all of the objectives I laid out in my analysis section and the project is functional, however, there are still quite a few improvments that could be
+made. The most pressing issue is the dependency on external libraries that aren't bundled with python, after that I would have focused on the extra gameplay features. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %\clearpage
@@ -1067,12 +1069,37 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
 
 \clearpage
 \section{External Libraries installation guide}
-To install all required packages the following commands must be run in command line                      
+All commands must be run in the windows command line
+\subsection{PIP}
+PIP comes pre-installed with most versions of python and so it is unlikely you'll have to install it. If you do have to install it, the installation guide is here: 
+\begin{center}
+\url{https://pip.pypa.io/en/stable/installing/}
+\end{center}
+\subsection{Pillow}
+Pillow is a fork of PIP and is used in the rendering part of the project, to install the following commands must be run
 \begin{lstlisting}
-python -m pip install --upgrade pip
-python -m pip install --upgrade Pillow
-python -m pip install --upgrade numpy
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade Pillow
 \end{lstlisting}
-Pillow Website: \url{https://pillow.readthedocs.io/en/stable/installation.html}
+The first checks to see if pip is up to date and the second actually installs Pillow. These commands come from the Pillow website, shown here:
+\begin{center}
+\url{https://pillow.readthedocs.io/en/stable/installation.html}
+\end{center}
+\subsection{numpy}
+Alongside Pillow numpy must also be installed, if pip has already been checked to see if it is up to date then only the following command needs to be run
+\begin{lstlisting}
+python3 -m pip install --upgrade numpy
+\end{lstlisting}
+otherwise, run both commands below
+\begin{lstlisting}
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade numpy
+\end{lstlisting}
+The numpy website link is below, if it is needed
+\begin{center}
+\url{https://numpy.org/install/l}
+\end{center}
+
+
 
 \end{document}

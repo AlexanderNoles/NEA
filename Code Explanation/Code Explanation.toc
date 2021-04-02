@@ -37,3 +37,6 @@
 \contentsline {section}{\numberline {16}Window.py}{27}{section.16}%
 \contentsline {section}{\numberline {17}MazeRendererNew.py}{30}{section.17}%
 \contentsline {section}{\numberline {18}External Libraries installation guide}{31}{section.18}%
+\contentsline {subsection}{\numberline {18.1}PIP}{31}{subsection.18.1}%
+\contentsline {subsection}{\numberline {18.2}Pillow}{31}{subsection.18.2}%
+\contentsline {subsection}{\numberline {18.3}numpy}{31}{subsection.18.3}%
