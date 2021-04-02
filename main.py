@@ -42,7 +42,7 @@ def change_state(state):      #Switches the state of the GUI to the one specifie
         enter_button = tk.Button(window, text = "Enter",bg = "white",width=30, command = lambda: change_state("username")).pack()
         exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=3)
         if not installed:
-            error_message = tk.Label(window,text="[PIL not installed, PIL is required for current version]",fg="red").pack(side="bottom",pady = 20)
+            error_message = tk.Label(window,text="[PIL or Numpy not installed, PIL and Numpy are required for current version]",fg="red").pack(side="bottom",pady = 20)
     if state == "username": #Users select screen
         title = tk.Label(window, text = "\n Accounts \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
@@ -77,30 +77,35 @@ def change_state(state):      #Switches the state of the GUI to the one specifie
         title_ = tk.Label(window, text = ("\n Custom Maze \n"), bg = "white", borderwidth = 1, relief = "groove").pack(fill = "x",pady=20)
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
         #GENERATION
-        title_ = tk.Label(window, text = ("\n Generation \n"), bg = "white", borderwidth = 1,width = 100, relief = "groove").pack(pady=20)
+        generation_frame = tk.Frame(window,width=10,height=10)
+        generation_frame.pack(side="left", anchor='n',padx=50)
+        title_ = tk.Label(generation_frame, text = ("\n Generation \n"), bg = "white", borderwidth = 1,width = 100, relief = "groove").pack(pady=20)
         #Maze Type 
-        maze_type_text = tk.Label(window, text = "Type").pack(padx=4,pady=(10,0))
-        variable = tk.StringVar(window)
+        maze_type_text = tk.Label(generation_frame, text = "Type").pack(padx=4,pady=(10,0))
+        variable = tk.StringVar(generation_frame)
         variable.set("normal")
-        maze_type_menu = tk.OptionMenu(window, variable, "normal","diamond")
+        maze_type_menu = tk.OptionMenu(generation_frame, variable, "normal","diamond")
         maze_type_menu.pack(pady=(0,10))
         #Width
-        width_text = tk.Label(window, text = "Width").pack(padx=4)
-        width_scale = tk.Scale(window, tickinterval=2, length=600, orient="horizontal",from_ = 2,to=50)
+        width_text = tk.Label(generation_frame, text = "Width").pack(padx=4)
+        width_scale = tk.Scale(generation_frame, tickinterval=2, length=600, orient="horizontal",from_ = 2,to=50)
         width_scale.pack()
         #Height
-        height_text = tk.Label(window, text = "Height").pack(padx=4)
-        height_scale = tk.Scale(window, tickinterval=2, length=600, orient="horizontal",from_ = 2,to=50)
+        height_text = tk.Label(generation_frame, text = "Height").pack(padx=4)
+        height_scale = tk.Scale(generation_frame, tickinterval=2, length=600, orient="horizontal",from_ = 2,to=50)
         height_scale.pack()
         #RENDERING
-        title_ = tk.Label(window, text = ("\n Rendering \n"), bg = "white", borderwidth = 1,width = 100, relief = "groove").pack(pady=(20,5))
+        render_frame = tk.Frame(window,width=10,height=10)
+        render_frame.pack(side="right", anchor='n',padx=50)
+        title_ = tk.Label(render_frame, text = ("\n Rendering \n"), bg = "white", borderwidth = 1,width = 100, relief = "groove").pack(pady=(20,5))
         #Cube Size
-        cs_text = tk.Label(window, text = "Cell Size").pack(padx=4,pady=(10,0))
-        cs_entry = tk.Entry(window, width=20)
+        cs_text = tk.Label(render_frame, text = "Cell Size").pack(padx=4,pady=(10,0))
+        cs_entry = tk.Entry(render_frame, width=20)
+        cs_entry.insert("end", '10')
         cs_entry.pack()
               
         generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white", command = lambda mt = variable, w = width_scale, h = height_scale, c = cs_entry: custom_maze(mt,h,w,c,"CUSTOM MAZE"))
-        generate_maze.pack(pady=30)
+        generate_maze.pack(pady=400)
         back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
 def create_levels(lower,upper,number_of_columns,title,maze_type,completed): #create a number of ordered buttons to represnt different levels, the level number is then passed to the load_maze function

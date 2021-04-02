@@ -7,6 +7,8 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{array,ragged2e}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 
 
 %setup
@@ -33,6 +35,7 @@
 	showstringspaces=false,
 	framesep=10pt,
 } 
+\renewcommand{\arraystretch}{1.7}
 
 \begin{document}
 
@@ -51,25 +54,20 @@
 \clearpage
 \part{Analysis}
 
-\section{Objective Outline}
-The objective of this project is to create a maze-solving game, fully coded in python. This project will need to include; 
-\begin{itemize}
-\item Level Select GUI
-\item Controllable maze generation
-\item Performative Maze Rendering
-\item Input and Collision detection
-\item SQL Relational database for handiling users and completed mazes
-\end{itemize}
-Given the entire project is based around maze generation, the algorithim used to generate the mazes needs to not only be contrallable
-but also suitably complex (as to avoid predictable generation).
-
 \section{Research}
-Research on maze generation algorithims was done using the book "Mazes for Programmers", with "Kruskal's algorithim" being the specific algorithim
-chosen. It is used to generate ``minimum spanning trees'', though in the context of maze generation a ``spanning tree'' is analogous to a "perfect maze" or
+\subsection{General Research}
+Research on maze generation algorithms was done using the book "Mazes for Programmers", with "Kruskal's algorithim" being the specific algorithim
+chosen. It is described as such in the book; "Kruskal's algorithm was developed by the mathematician and computer scientist Joseph Kruskal in 1956 to
+construct \emph{minimum spanning trees}." "Basically, Kruskal was trying to solve the following problem. Let's say you start with a graph, or grid, where
+every possible passage that might connect neighboring cells is given a cost." "How do you construct a maze from that initial grid whose passages have costs
+that sum to the lowest total value? \emph{What's the cheapest tree that can be built?}". Iin the context of maze generation a ``spanning tree'' is analogous to a "perfect maze" or
 a maze where any cell can be reached from any other cell. This is useful as it ensures any maze generated is solvable. The word ``minimum'' means that the 
 spanning tree is generated in the least expensive way possible, with the cost being calculated using weights attached to each individual corridor between maze
 cells. Corridors having weights allows the program to control how the maze generates while still keeping some randomness, avoiding the mazes becoming reptative immediately.
-
+The algorithm also has a tendency to creating hook-like generation patterns, this makes the mazes easier to solve than they actually look, as a lot of possible paths can
+be immediately discounted. On a much more general level the maze can be thought of as generating and joining together a bunch of smaller mazes.
+\linebreak
+\linebreak
 In terms of actually rendering the maze/player, during research I found two main options, one, using Pygame or, two, making it myself. The former of the
 two would be easier but it would likely run worse than the latter and give me less control over how the rendering worked. The maze itself would exist entirely 
 within screen space (the actual pixels on screen), making the implementation simpler regardless of what option is picked. It should also be noted that pygame
@@ -77,11 +75,67 @@ doesn't come pre-installed with python, though it is likely a different external
 second option was chosen.
 Ultimately, I went with the second option due to the added control, I decied to use Pillow (a fork of P.I.L) along with tkinter to create the
 implementaion.
+\\
+\linebreak
+\linebreak
+\subsection{Examples of Maze Games}
+\begin{minipage}{0.4\textwidth}
+\includegraphics[scale=0.3]{example of old maze}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}\raggedright
+Here is shown an example of a very early maze game, called "Maze War". While the game is mostly played in first-person there is also a top-down map
+shown. Thier representation of the maze is seemingly made up of cells that can eithier be walls or non-walls, for my implementation I instead opted to
+have each cell have four toggleable walls. 
+\end{minipage}
+\linebreak
+\\
+\linebreak
+\begin{minipage}{0.4\textwidth}
+\includegraphics[scale=0.48]{better example}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}\raggedright
+This example is much closer to what I wanted, including the font used (excluding the title) and the way the maze is presented. The only major difference to the way
+the maze looks is that my version doesn't include a blue backing. There is also a slight visual glitch where some of the lines of the maze are rendered thicker than others,
+which is likely caused by thier renderer not being adjusted for the given screen size.
+\end{minipage}
+\linebreak
 
-\section{Organization of Solution}
-%\begin{center}
-%	\fbox{\includegraphics[scale=0.5]{Code Organization Diagram}}
-%\end{center}
+\subsection{Potential Users}
+%Can't find one due to pandemic
+Unfortunately, due to the recent pandemic I have been unable to find a potential user. Due to this I've had to leave out this section and also the follow-up section
+in the evaluation.
+
+\section{Objective Outline}
+The objective of this project is to create a maze-solving game, fully coded in python. This project will need to include, in order of importance; 
+%Add more sub-objectives
+\begin{enumerate}
+	\item Performative Maze Rendering
+	\begin{enumerate}
+		\item Layer Based Rendering
+		\item Ability to edit any given pixel on a given layer
+	\end{enumerate}
+	\item Gameplay Mechanics
+	\begin{enumerate}
+		\item Key input
+		\item Collision detection
+		\item Ability to win
+	\end{enumerate}
+	\item Controllable maze generation
+	\item GUI
+	\begin{enumerate}
+		\item User Select
+		\item Maze Type Select
+		\item Level select
+	\end{enumerate}
+	\item System for storing users completed levels
+\end{enumerate}
+Given the entire project is based around maze generation, the algorithim used to generate the mazes needs to not only be contrallable
+but also suitably complex (as to avoid predictable generation).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\part{Documented Design}
+\section{Program Structure Overview Diagram}
 The project will be organized into five scripts, each handiling sections of the project;
 \begin{itemize}
 \item main.py - Controls/Passes data to the scripts, MazeDatabase, MazeGeneration and MazeRenderer aswell as handiling G.U.I.
@@ -90,11 +144,6 @@ The project will be organized into five scripts, each handiling sections of the 
 \item Window.py - The previously discussed implementation of tkinter and Pillow to create rendering. It will also handle input attached to the windows it creates.
 \item MazeRenderer.py - Handles game logic (such as collision) and implements the Window.py script to display the visuals on screen and control the player.
 \end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
-\part{Documented Design}
-\section{Program Organization Diagram}
 \begin{center}
 	\includegraphics[scale=0.5]{Code Organization Diagram}
 \end{center}
@@ -105,20 +154,74 @@ while "MazeGeneration.py" is controlled by "main.py" the generated maze is immed
 "MazeRenderer.py" has a link to "Window.py" which it uses to create the window of editable pixels used to render the game. There is also a link back to "main.py" as the user
 is returned there after the level is completed or quit. "Window.py" also has a dotted link to tkinter and Pillow for the same reason as "main.py" and "MazeDatabase.py" mentioned above.
 \clearpage
-\section{Window/Layer Class Diagrams}
+
+\section{Database Diagrams}
+%Justify use of relational database
+To complete my objective of storing a given users completed levels I decided to use a relational database. My justification for this is two-fold, one, I wanted to demonstrate my ability
+to use SQLite3 and, two, relational databases allow for a lot more flexibilty/ease-of-use comparaed to storing all of the different users completed levels in a text file.
+\subsection{Tables}
+\includegraphics[scale=1]{Users Table}
+\linebreak
+\includegraphics[scale=1]{completedLevels Table}
+\linebreak
+The fields "normal\_maze" and "diamond\_maze" are both meant to be lists,  however, you are unable to properly store lists in a database. Hence, they must be converted into
+text and then also, consequently, be converted back into lists when they need to be accessed. For example, the array [1,2,3,4,5] is converted to '1\#2\#3\#4\#5' by
+iterating through the list and appending each entry to a string. The '\#' would also be appended unless the entry is the last one in the array. To convert back to an array a simple
+.split('\#') is used on the string.
+
+\subsection{Entity-Relationship Diagram}
+\begin{center}
+\includegraphics[scale=1]{Database E-R Diagram}
+\end{center}
+The entity-relationship diagram for the database is very simple as the database itself is simple. There is only one relationship, a one-to-one, between users and completedLevels.
+This represents the foreign key user\_id, and is used to link a user's completed levels to them.
+
+\clearpage
+
+\section{Class Diagrams}
+%Write explanations of why these exist/how they are used
+\subsection{Window}
 \begin{center}
 	\includegraphics[scale=1]{Window Class}
-	%Should probably colour code the above diagram at some point
 \end{center}
+\subsection{Layer}
 \begin{center}
 	\includegraphics[scale=1]{Layer Class}
-	%Should probably colour code the above diagram at some point
 
 	\color{mygrey}(Note: In Python a nested class doesn't imply any relationship)
 \end{center}
 
 \clearpage
-\section{Maze Select G.U.I}
+
+\section{Kruskals Algorithm}
+
+\begin{center}
+	\includegraphics[scale=0.8]{Kruskals}
+\end{center}
+
+\clearpage
+\section{Data Structures}
+\subsection{Maze Array}
+A "maze array" is a data structrue meant to represent the maze and is essentially a 2D array. Each cell in the maze has a coordinate and this corresponds to an index in one of the arrays,
+meaning each 1D array is equivalent to a row of maze cells. Stored within each actual cell is four integers, which can eithier be one or zero and these represent a wall or a lack of a wall
+respectively. A possible optimization would be for these cells to only contain information about the top and left walls as this would still represent almost every wall in the maze, apart from
+the very edges on the bottom and right. Given the player isn't able to walk outside of the maze anyway they could simply be replaced with a two lines. The maze array is output by the 
+"MazeGeneration.py" script before being transferred to "MazeRenderer.py" where the maze is then shown on screen.
+\begin{center}
+	\includegraphics[scale=0.5]{Maze Cell Diagram}
+
+	\color{mygrey}(The numbers on the Visual Representation correlate to the index in the array)
+\end{center}
+\subsection{Weight Array}
+A "weight array" is a very similar data structure to the maze array as it its also a 2D array. Each index in the maze array has a corresponding index in the weight array, they are only kept
+in seperate arrays as the data in the weight array does not need to be passed onto "MazeRenderer.py". For every cell wall there is a weight value stored, in the same way walls are stored in 
+the "maze array", however, there is also a "group" integer stored with every cell. This group value is used in the Krusklas algorithm used for maze generation and is set to a default/ignored group before maze
+generation is run. Having this ignored group is important as it allows the check to see if every cell is in one group to not return true before any alterations have been made to
+the maze.
+
+\clearpage
+\section{G.U.I }
+\subsection{Maze and User Selection}
 \begin{center}
 %Start Screen
 	\includegraphics[scale=0.7]{Start Screen}
@@ -167,7 +270,7 @@ is returned there after the level is completed or quit. "Window.py" also has a d
 	and height, while the only option for rendering is cell size. More options could certainly be added (as my rendering scripts allow for it) if I had more time.
 \end{center}
 \clearpage
-\section{Game Visuals}
+\subsection{Game Visuals}
 \begin{center}
 %Loading Screen
 	\includegraphics[scale=0.7]{Loading Screen}
@@ -191,17 +294,80 @@ is returned there after the level is completed or quit. "Window.py" also has a d
 	This screen is displayed for a few seconds after the maze is completed, it features the words "Maze Completed" along with a little pixel art crown.
 \end{center}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\part{Testing}
+\section{Test Table (Post-Development)}
+\begin{tabular}{|P{3cm}|P{1cm}|P{3cm}|P{3cm}|P{3cm}|P{1.2cm}|P{2cm}| }
+\hline
+ Objective & Test & Input & Expected Result & Actual Result & Passed & Comments \\
+\hline
+\textbf{GUI }&&&&&& \\
+\hline
+ Create New User & 1 & ExampleUser & New user is added to database & As expected & Yes & \\
+\hline
+Select User & 2 & Click on ExampleUser button & user\_id is set to the user id of ExampleUser & As expected & Yes & \\
+\hline
+ Select Maze Type & 3 & Normal Maze Type Selected & Maze Generated is of Normal Maze type & As expected & Yes & \\
+\hline
+ Select Maze Dimensions & 4 & Level 5 selected & Should generate a maze of size 8 by 8 & As expected & Yes & \\
+\hline
+ Input Maze of non-equal dimensions in custom maze screen & 5 & Entered dimensions of 16 by 5 & Should generate a maze of size 16 by 5 & As expected & Yes & \\
+\hline
+\textbf{Gameplay}&&&&&& \\
+\hline
+ Arrow Key Input & 6 & Every arrow key in turn & Should move in one of the four directions depending on arrow key pressed & As expected & Yes & Test was done in a maze without walls so all directions could be tested easily\\
+\hline
+ Collision Detection & 7 & Attempts to move through wall & Movement is not allowed & As expected & Yes & \\
+\hline
+ Win detection & 8 & Moves to the win position & Game ends, displaying "Maze Completed" screen & As expected & Yes & \\
+\hline
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
-\part{Code Highlights}
+\part{Evaluation}
+\section{Were the objectives met?}
+\subsection{Performative Maze Rendering}
+I believe this objective has been met very well, as both "Layer Based Rendering" and the "ablilty to edit any given pixel on a given layer" have been implemented. The program also runs
+at about 2000 frames per second, however, the fps calculation is admittely limited. If the time taken to execute a frame is recorded as 0 then the calcualtion cannot be performed as to avoid
+a zero division error. The code could also be compilied using something such as Cython. This means that the frame rate could be higher, though 2000 frames is certainly enough. The pixels on screen can also be any colour representable in the format (8-bit integer, 8-bit integer,8-bit integer), meaning there are 1,6581,375 possible colours. Currently, the main part of the rendering that could be improved is the dependency on outside packages,
+specifically Pillow and Numpy.
+
+\subsection{Gameplay Mechanics}
+I also feel that the desired gameplay mechanics have been implemented well, with things such as the input keys and win location being customizable. However, the collision system used 
+very specific to the project with it working entirely off the maze\_array. I also think the gameplay can get monotonous and more mechanics would be helpful to break up the gameplay, for
+example, tunnels that lead to another part of the maze. If there was also a cap on how big groups could get then the maze would instead be spilt into multiple smaller mazes with the tunnels
+used to connect them. Of course, there would need to be checks in place to make sure the maze was still solvable.
+
+\subsection{Controllable maze generation}
+In my opnion, similar to the Gameplay Mechanics, this objective has been met but ultimately more could be done. For example, the book used for research ("Mazes for Programmers") talks 
+about weaving which could have been an interesting addition to the maze generation. In terms of storing the maze, I think the way of accessing a specific cell is implemented well, with each index
+being analogous to that given cells coordinate, however, as discussed in the section about the maze\_array data structure, there could have been optimizations made to the way information
+about cell walls was stored.
+
+\subsection{GUI}
+I believe my GUI has everything I outlined as an objective for it. It has a user select screen, a maze type select screen and a level select screen. The user select screen also has a button leading to a user creation screen where a username can be input, however, it does lack the ability to delete users. On the maze typeselect screen there is two maze types avaliable as well as a custom
+ maze maze option, leading to an options menu. Lastly there is the level select screen which features adjustable columns and adjustable number of levels overall. The text on the buttons is 
+turned green when a level is completed, utilizing the database system.
+
+\subsection{System for storing users completed levels}
+I think that the database system works well and it is utilized for various things, as discussed above and it works well for all of those things. However, there is no ability to remove a user from the database, meaning any user created is permanent, though any given user's progress can be reset. Apart from pure functionality, its purpose was to demonstrate that I had the ability to use
+SQLite3 and I think it does that well.
 \clearpage
+
+\section{Independent Feedback}
+As mentioned in the analysis section due to the covid pandemic I was unable to find a third-party to get feedback from, hence, this section has been skipped.
+\section{Conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\clearpage
+%\part{Code Highlights}
+%\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
 \part{Code breakdown by function}
-\clearpage
 \section{main.py}
 This script handles the creation of the UI as well as running the Maze Database, MazeGenerationNew and 
 MazeRendererNew scripts.
@@ -216,7 +382,7 @@ def change_state(state):
         enter_button = tk.Button(window, text = "Enter",bg = "white",width=30, command = lambda: change_state("username")).pack()
         exit_button = tk.Button(window, text = "Exit",width=30, bg = "white", fg = "red", command = lambda: exit()).pack(pady=3)
         if not installed:
-            error_message = tk.Label(window,text="[PIL not installed, PIL is required for current version]",fg="red").pack(side="bottom",pady = 20)
+            error_message = tk.Label(window,text="[PIL or Numpy not installed, PIL and Numpy are required for current version]",fg="red").pack(side="bottom",pady = 20)
     if state == "username": 
         title = tk.Label(window, text = "\n Accounts \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
@@ -900,7 +1066,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
-\section{Required Libraries}
+\section{External Libraries installation guide}
 To install all required packages the following commands must be run in command line                      
 \begin{lstlisting}
 python -m pip install --upgrade pip
