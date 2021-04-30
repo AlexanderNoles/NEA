@@ -43,7 +43,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     ending = True
     drawing_per_frame = False
     input_confirmed = False
-    input_delay = 0
+    input_delay = 0    
     while running:
         #Anything in this loop is run every frame
         start_time = time.time() #For measuring execution time, it is used for debug, testing program speed and the calculation of delta_time        
@@ -116,7 +116,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
                 text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])
                 #Instantiate Player
                 player_pos = draw_player(True,cube_size,screen,player_pos,maze_width,maze_height,[width,height])  
-                position_set_to = player_pos            
+                position_set_to = player_pos
             else:
                 if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):
                     if ending:
@@ -146,7 +146,7 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
         try:
             fps = 1/delta_time         
         except:
-            pass
+            fps = '#'
     screen.quit()
     return to_return
         
@@ -175,18 +175,18 @@ def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if th
 def draw_maze_per_cell(maze_dimensions, coords_to_draw, window_dimensions, cube_size, win_pos, screen, maze_data):  #Draw maze cell per frame
     offsetx = coords_to_draw[0] * (cube_size-1)
     offsety = coords_to_draw[1] * (cube_size-1)
-    draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[coords_to_draw[1]][coords_to_draw[0]])
+    draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,0,maze_data[coords_to_draw[1]][coords_to_draw[0]])
     if won([coords_to_draw[0],coords_to_draw[1]],win_pos[0],win_pos[1]):
-        draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
+        draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions,0)
 
 def draw_maze(maze_dimensions, window_dimensions, cube_size, win_pos, screen, maze_data):   #Draw maze all at once
     offsetx = 0
     offsety = 0
     for y in range(0,len(maze_data)):
         for x in range(0,len(maze_data[y])):
-            draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,maze_data[y][x])
+            draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,0,maze_data[y][x])
             if won([x,y],win_pos[0],win_pos[1]):
-                draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions)
+                draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions,0)
             offsetx += cube_size-1
         offsety += cube_size-1
         offsetx = 0
@@ -206,12 +206,12 @@ def draw_player(first_pos,cube_size,screen,position,maze_width,maze_height,windo
 def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
     center = [0+offset[0],0+offset[1]]
     #Draw progress bar shell
-    draw_rectangle([int(center[0]-width/2),center[1]],width,15,False,white,screen,window_dimensions,1)
+    draw_rectangle([int(center[0]-width/2),center[1]],width,15,False,white,screen,window_dimensions,0,1)
     #Draw actual progress
-    draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions)
+    draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions,0)
     screen.update()
 
-def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
+def text(text,text_size,offset,colour,screen,window_dimensions,layer_num = 0):        #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
     text_dict = {                                                       
         "a":0,"A":0,"b":1,"B":1,"c":2,"C":2,"d":3,"D":3,"e":4,"E":4,
         "f":5,"F":5,"g":6,"G":6,"h":7,"H":7,"i":8,"I":8,"j":9,"J":9,
@@ -237,7 +237,7 @@ def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws e
                 if character_data[(y*int(len(character_data)/5))+x] == 0:
                     pass
                 else:
-                    draw_rectangle([(-text_width/2)+offsetx+offset_character+(offset[0]),(-text_height/2)+offsety+(offset[1])],text_size,text_size,True,colour,screen,window_dimensions)
+                    draw_rectangle([(-text_width/2)+offsetx+offset_character+(offset[0]),(-text_height/2)+offsety+(offset[1])],text_size,text_size,True,colour,screen,window_dimensions,layer_num)
                 offsetx += text_size
             offsety += text_size
             offsetx = 0
@@ -245,7 +245,7 @@ def text(text,text_size,offset,colour,screen,window_dimensions):        #Draws e
         offsety = 0
     screen.update()
         
-def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
+def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,layer_num,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
     width = alter_to_fit_scale(width)
     height = alter_to_fit_scale(height)
     for i in range(0,len(startpos)):
@@ -266,7 +266,7 @@ def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,*a
                 if (x in range(startpos[0]+list_one[0],startpos[0]+width-list_one[1])) and (y in range(startpos[1]+list_one[2],startpos[1]+height-list_one[3])):
                     pass
                 else:
-                    screen.set_pixel([x,y],colour)
+                    screen.set_pixel([x,y],colour,layer_num = layer_num)
 
 #CONVERTORS                    
 def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts x and y coords to pixel measurments so that the player can be properly positioned 
