@@ -76,8 +76,14 @@ second option was chosen.
 Ultimately, I went with the second option due to the added control, I decied to use Pillow (a fork of P.I.L) along with tkinter to create the
 implementaion.
 \\
-\linebreak
-\linebreak
+\subsection{Potential Users}
+%Can't find one due to pandemic
+Unfortunately, due to the recent pandemic I have been unable to find a potential user. Due to this I've had to leave out this section and also the follow-up section
+in the evaluation.
+\\
+
+
+\clearpage
 \subsection{Examples of Maze Games}
 \begin{minipage}{0.4\textwidth}
 \includegraphics[scale=0.3]{example of old maze}
@@ -99,38 +105,56 @@ the maze looks is that my version doesn't include a blue backing. There is also 
 which is likely caused by thier renderer not being adjusted for the given screen size.
 \end{minipage}
 \linebreak
-
-\subsection{Potential Users}
-%Can't find one due to pandemic
-Unfortunately, due to the recent pandemic I have been unable to find a potential user. Due to this I've had to leave out this section and also the follow-up section
-in the evaluation.
-
+\\
+\linebreak
+\begin{minipage}{0.4\textwidth}
+\includegraphics[scale=0.115]{pacman}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}\raggedright
+Pacman is a famous example of a game featuring a maze, however, it differs significantly from the two previous examples. This is true for both the original pacman title and the more modern phone app. In both pressure is put on the player, to make sure they are engaged with the game, this is done through the use ghosts and/or a "wall" that will kill you instantly if it touches you. 
+These are both shown in the image on the right. 
+\end{minipage}
+\linebreak
+\\
+\linebreak
+\begin{minipage}{0.4\textwidth}
+\includegraphics[scale=0.76]{monster maze}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}\raggedright
+Like the first example, the game pictured on the left "3D Monster Maze" is played in first person, however, it lacks the top-down maze view. Similarly to Pac-Man you are hunted, however, there are substantial differences. For example, there is only one monster and, more importatntly, score is gained from surviving rather than picking up dots. Arguably, this game is the furthest from what I want to create but it does a good job of keeping pressure on the player.
+\end{minipage}
+\linebreak
+\\
+\linebreak
+While having enemies in the maze could be one way of implementing incentive for the player to move through said maze, a timer would probably be an easier solution. In a way this is more similar to the purpose of the wall, limiting the player from spending too long making decisions. However, this isn't a major priority as while it would make the game more fun, it doesn't necessarily showcase any major programming skills that aren't evidenced elsewhere.
+\clearpage
 \section{Objective Outline}
-The objective of this project is to create a maze-solving game, fully coded in python. This project will need to include, in order of importance; 
+The point of this project is to create a maze-solving game, fully coded in python. Hence, the objectives are, in order of importance; 
 %Add more sub-objectives
 \begin{enumerate}
-	\item Performative Maze Rendering
+	\item The program must have performative rendering so that the program can run at a sixty frames per second or above (the standard benchmark for modern video games). To do this it should be capable of;
 	\begin{enumerate}
-		\item Layer Based Rendering
-		\item Ability to edit any given pixel on a given layer
+		\item Rendering in Layers so that everything on screen doesn't have to be updated every frame
+		\item Having any pixel on the screen editable at any given time
 	\end{enumerate}
-	\item Gameplay Mechanics
+	\item The mazes need to be fully playable and so the system needs to also be capable of;
 	\begin{enumerate}
-		\item Key input
-		\item Collision detection
-		\item Ability to win
+		\item Taking keyboard input 
+		\item Detecting if the player is trying to move through a wall and stopping them
+		\item Checking to see if the player is at the maze's exit
 	\end{enumerate}
-	\item Controllable maze generation
-	\item GUI
+	\item The generation of the mazes needs to be controllable while also featuring some form of randomness
 	\begin{enumerate}
-		\item User Select
-		\item Maze Type Select
-		\item Level select
+		\item The data representing the maze also needs to be readable in a way that it can easily be used to implement some of the above features
 	\end{enumerate}
-	\item System for storing users completed levels
+	\item A fully functioning GUI will also be needed, including;
+	\begin{enumerate}
+		\item A screen for selecting the user, that includes the option to create a new user
+		\item Another screen for selecting a certain type of maze
+		\item As well as a screen for selecting the difficulty or level of the selected maze type
+	\end{enumerate}
+	\item Finally there should be a system for storing any levels the users have completed
 \end{enumerate}
-Given the entire project is based around maze generation, the algorithim used to generate the mazes needs to not only be contrallable
-but also suitably complex (as to avoid predictable generation).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
@@ -297,6 +321,75 @@ the maze.
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
 \part{Testing}
+%Testing Intro
+Below is my testing section, within it is included failed tests/issues during development itself (and how the problems were fixed) as well as a post-development test table.
+\section{Failed tests/issues and fixes}
+%%%%%% Create User
+\begin{tabular}{|P{3.5cm}|P{0.8cm}|P{3cm}|P{4cm}|P{3cm}|P{3cm}| }
+\hline
+ \textbf{Objective} & \textbf{Test} & \textbf{Input} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Fix} \\
+\hline
+Create New User & 1 & Username & User is created and added to the database & (See Image 1) & Missing comma (See Image 2) \\
+\hline
+\end{tabular}
+\\
+\begin{center}
+\fbox{
+\includegraphics[scale=0.6]{Error - Username}}
+\\
+\vphantom{0}
+\\
+\color{mygrey}(Image 1)
+\end{center}
+
+\begin{center}
+\fbox{
+\includegraphics[scale=0.4]{Error - Username 2}}
+\\
+\vphantom{0}
+\\
+\color{mygrey}(Image 2)
+\end{center}
+
+%%%%%% maze generation
+\vphantom{0}
+\\
+\begin{tabular}{|P{3.5cm}|P{0.8cm}|P{3cm}|P{4cm}|P{3cm}|P{3cm}| }
+\hline
+ Maze Generation was taking several magnitudes longer than it should have & 2 & Level 30 maze selected & Maze is generated in under 5 seconds & Generation takes more than a minute (See Image 3) & Weight Value for generation was too high (See Image 4/5) \\
+\hline
+\end{tabular}
+\\
+\begin{center}
+\fbox{
+\includegraphics[scale=1]{Error - Maze}}
+\\
+\vphantom{0}
+\\
+\color{mygrey}(Image 3)
+\end{center}
+
+\begin{center}
+\fbox{
+\includegraphics[scale=0.3]{Error - Maze 2}}
+\\
+\vphantom{0}
+\\
+\color{mygrey}(Image 4)
+\end{center}
+
+\begin{center}
+\fbox{
+\includegraphics[scale=1]{Error - Maze 3}}
+\\
+\vphantom{0}
+\\
+\color{mygrey}(Image 5)
+\end{center}
+%%%%%%%%%%%%%%%%%%
+
+
+\clearpage
 \section{Test Table (Post-Development)}
 \begin{tabular}{|P{3cm}|P{1cm}|P{3cm}|P{3cm}|P{3cm}|P{1.2cm}|P{2cm}| }
 \hline
@@ -1076,7 +1169,7 @@ PIP comes pre-installed with most versions of python and so it is unlikely you'l
 \url{https://pip.pypa.io/en/stable/installing/}
 \end{center}
 \subsection{Pillow}
-Pillow is a fork of PIP and is used in the rendering part of the project, to install the following commands must be run
+Pillow is a fork of PIL and is used in the rendering part of the project, to install the following commands must be run
 \begin{lstlisting}
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade Pillow
