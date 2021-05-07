@@ -8,6 +8,8 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{array,ragged2e}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 
 
@@ -76,15 +78,20 @@ second option was chosen.
 Ultimately, I went with the second option due to the added control, I decied to use Pillow (a fork of P.I.L) along with tkinter to create the
 implementaion.
 \\
-\subsection{Potential Users}
-%Can't find one due to pandemic
-Unfortunately, due to the recent pandemic I have been unable to find a potential user. Due to this I've had to leave out this section and also the follow-up section
-in the evaluation.
-\\
-
+\subsection{Potential Users Intial Feedback summary}
+%Just lie about it lmao
+Due to the recent pandemic, I was forced to get potential users from two forces. One, people I already knew, that I had a direct line of communication to, or two, people I could ask questions to on internet forums. This meant no interviews were conducted but I was able to get some general feedback. Said feedback can be summarised into various key points, which are as follows;
+\begin{enumerate}
+	\item There should be a general pattern to some of the mazes (e.g. diamond, segmented squares)
+	\item Non-square mazes would be a good addition, for example, quite a few suggested circles
+	\item Input should feel nice, things such as being able to hold down the movement keys to keep moving in a given direction
+	\item A custom maze screen that allows you to create very large mazes (even if they would be next to immpossible to complete)
+	\item Add music if it was possible for me to do so
+	\item One user also suggested a bloom like effect on the walls of the maze
+\end{enumerate}
 
 \clearpage
-\subsection{Examples of Maze Games}
+\section{Examples of Maze Games}
 \begin{minipage}{0.4\textwidth}
 \includegraphics[scale=0.3]{example of old maze}
 \end{minipage}
@@ -132,7 +139,7 @@ While having enemies in the maze could be one way of implementing incentive for 
 The point of this project is to create a maze-solving game, fully coded in python. Hence, the objectives are, in order of importance; 
 %Add more sub-objectives
 \begin{enumerate}
-	\item The program must have performative rendering so that the program can run at a sixty frames per second or above (the standard benchmark for modern video games). To do this it should be capable of;
+	\item The program must have performative rendering so that the program can run at a sixty frames per second or above (the standard benchmark for modern video games). It should be capable of;
 	\begin{enumerate}
 		\item Rendering in Layers so that everything on screen doesn't have to be updated every frame
 		\item Having any pixel on the screen editable at any given time
@@ -217,11 +224,67 @@ This represents the foreign key user\_id, and is used to link a user's completed
 
 \clearpage
 
-\section{Kruskals Algorithm}
-
+\section{Algorithms}
+\subsection{Kruskals Algorithm Flowchart}
 \begin{center}
-	\includegraphics[scale=0.8]{Kruskals}
+	\includegraphics[scale=0.97]{Kruskals}
 \end{center}
+"Kruskals Algorithim" is the algorithim used to actually generate the mazes. It does this utilizing a \textbf{weight\_group\_array} and by altering
+the corridors between cells in the \textbf{maze\_array}. The outline of how it works is this; All cells have a group, at the start this is the default group (i.e. zero).
+Any cell within a group is reachable by any other cell in a group (unless it is the default group), they are essentially perfect mazes within the larger maze.
+At the start of each iteration of the while loop the code finds corridors (connections between cells) based on the lowest weight, this is done using the afformentioned
+\textbf{weight\_group\_array}.
+\clearpage
+\subsection{Psuedocode for important algorithm}
+\subsubsection{Create Level Screen}
+\begin{algorithm}
+\caption{create\_levels (lower,upper,number of columns,title,array of completed levels)}
+\begin{algorithmic} 
+\STATE \textbf{FUNC} remove all current GUI elements
+\STATE set current button row/y-coordinate as first
+\STATE instantiate title
+\STATE $i \leftarrow 0$
+\FORALL{in range between lower and upper+1 bound}
+\STATE$ button\_text \leftarrow i$
+\STATE $i \leftarrow +1$
+\IF{Level has already been completed}
+\STATE Set button text to green
+\ELSE
+\STATE Set button text to black
+\ENDIF
+\STATE instantiate button
+\IF{i\%number of columns}
+\STATE set current button row as next row
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+\vphantom{0}
+\\
+The above function is explained in Psuedocode as it should be the only part of the GUI code that requires much more than simple instantiation of GUI elements.  
+
+
+\subsubsection{Create a standard weight array}
+\begin{algorithm}
+\caption{generate\_normal\_weight\_array (height,width, max weight)}
+\begin{algorithmic} 
+\STATE $weight\_array \leftarrow [ ]$
+\STATE $x \leftarrow 0$
+\STATE $y \leftarrow 0$
+\FORALL{in range between 0 and width}
+\STATE $weight\_array.append \leftarrow [ ]$
+\FORALL {in range between 0 and height}
+\STATE $weight\_array.append \leftarrow$ [4 random numbers between 1 and max\_weight as well as the defualt group]
+\STATE $y \leftarrow +1$
+\ENDFOR
+\STATE $x \leftarrow +1$
+\ENDFOR
+\RETURN weight\_array
+\end{algorithmic}
+\end{algorithm}
+\vphantom{0}
+\\
+The above function is an example of a way to create a standard weight array that could be used in the kruskals algorithm shown in the flowchart above.
 
 \clearpage
 \section{Data Structures}
@@ -317,6 +380,10 @@ the maze.
 
 	This screen is displayed for a few seconds after the maze is completed, it features the words "Maze Completed" along with a little pixel art crown.
 \end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{Code Breakdown by function}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
@@ -418,51 +485,41 @@ Select User & 2 & Click on ExampleUser button & user\_id is set to the user id o
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \clearpage
-\part{Evaluation}
+\part{New Evaluation}
 \section{Were the objectives met?}
 \subsection{Performative Maze Rendering}
-I believe this objective has been met very well, as both "Layer Based Rendering" and the "ablilty to edit any given pixel on a given layer" have been implemented. The program also runs
-at about 2000 frames per second, however, the fps calculation is admittely limited. If the time taken to execute a frame is recorded as 0 then the calcualtion cannot be performed as to avoid
-a zero division error. The code could also be compilied using something such as Cython. This means that the frame rate could be higher, though 2000 frames is certainly enough. The pixels on screen can also be any colour representable in the format (8-bit integer, 8-bit integer,8-bit integer), meaning there are 1,6581,375 possible colours. Currently, the main part of the rendering that could be improved is the dependency on outside libraries,
-specifically Pillow and Numpy.
+I believe this objective has been met very well, as both sub-objectives ("Layer Based Rendering" and the "Ability to edit any given pixel on a given layer") have been implemented. The sixty frames per second minimum has also been certainly met with the program averaging ~2000 frames, however, the  fps calculation is admittely limited. If the time taken to execute a frame is recorded as 0 then the calcualtion cannot be performed as to avoid a zero division error. The code could also be compilied using something such as Cython. This means that the frame rate could be higher, though 2000 frames is certainly enough. The pixels on screen can also be any colour representable in the format (8-bit integer, 8-bit integer,8-bit integer), meaning there are 1,6581,375 possible colours. Currently, the main part of the rendering that could be improved is the dependency on outside libraries, specifically Pillow and Numpy, this would be the part of the program that I would seek to fix first. 
 
 \subsection{Gameplay Mechanics}
-I also feel that the desired gameplay mechanics have been implemented well, with things such as the input keys and win location being customizable. However, the collision system used 
-very specific to the project with it working entirely off the maze\_array. I also think the gameplay can get monotonous and more mechanics would be helpful to break up the gameplay, for
-example, tunnels that lead to another part of the maze. If there was also a cap on how big groups could get then the maze would instead be spilt into multiple smaller mazes with the tunnels
-used to connect them. Of course, there would need to be checks in place to make sure the maze was still solvable.
+The program is also capable of all the outlined gameplay features, it can read whatever key is currently being pressed on the keyboard as well as use the current maze coordinates to check what walls are around the player. However, the collision system used very specific to the project with it working entirely off the maze\_array. The program can also use said maze coordinates to see if the player is at the exit of the maze. Unfortunately, I think the gameplay can get monotonous and more mechanics would be helpful to break up the gameplay, these could be the timer/monsters mentioned in the analysis or something like tunnels that lead to another part of the maze. If there was also a cap on how big groups could get then the maze would instead be spilt into multiple smaller mazes with the tunnels used to connect them. Of course, there would need to be checks in place to make sure the maze was still solvable.
 
-\subsection{Controllable maze generation}
-In my opnion, similar to the Gameplay Mechanics, this objective has been met but ultimately more could be done. For example, the book used for research ("Mazes for Programmers") talks 
-about weaving which could have been an interesting addition to the maze generation. In terms of storing the maze, I think the way of accessing a specific cell is implemented well, with each index
-being analogous to that given cells coordinate, however, as discussed in the section about the maze\_array data structure, there could have been optimizations made to the way information
-about cell walls was stored.
+\subsection{Controllable Maze Generation}
+In my opnion, similar to the Gameplay Mechanics, this objective has been met but ultimately more could be done. For example, the book used for research mentioned in the analysis ("Mazes for Programmers") talks about weaving (underpasses and bridges) which could have been an interesting and unique addition to the maze generation. In terms of storing the maze, I think the way of accessing a specific cell is implemented well (being utilized in the gameplay mechanics discussed above), with each index being analogous to that given cells coordinate. However, as discussed in the section about the maze\_array data structure, there could have been optimizations made to the way information about cell walls is stored.
 
 \subsection{GUI}
 I believe my GUI has everything I outlined as an objective for it. It has a user select screen, a maze type select screen and a level select screen. The user select screen also has a button leading to a user creation screen where a username can be input, however, it does lack the ability to delete users. On the maze typeselect screen there is two maze types avaliable as well as a custom
- maze maze option, leading to an options menu. Lastly there is the level select screen which features adjustable columns and adjustable number of levels overall. The text on the buttons is 
-turned green when a level is completed, utilizing the database system.
+ maze option, leading to an options menu. Lastly there is the level select screen which features adjustable columns and adjustable number of levels overall. The text on the buttons is turned green when a level is completed, utilizing the database system evaluated below.
 
+\clearpage
 \subsection{System for storing users completed levels}
-I think that the database system works well and it is utilized for various things, as discussed above and it works well for all of those things. However, there is no ability to remove a user from the database, meaning any user created is permanent, though any given user's progress can be reset. Apart from pure functionality, its purpose was to demonstrate that I had the ability to use
-SQLite3 and I think it does that well.
-\clearpage
+I think that the database system works well and it is utilized for various things, all discussed above. However, there is no ability to remove a user from the database, meaning any user created is permanent, though any given user's progress can be reset. Apart from pure functionality, its purpose was to demonstrate that I had the ability to use SQLite3 and I think it also does that well.
 
-\section{Independent Feedback}
-As mentioned in the analysis section due to the covid pandemic I was unable to find a third-party to get feedback from, hence, this section has been skipped.
+\section{Is the feedback from potential users met?}
+I believe that I met some but not all of the points outlined in the "Potential Users Intial Feedback summary" section of the Analysis. There is certainly general patterns to the mazes, defined as different maze types but all mazes remain square. I also personally believe input feels nice, allowing the user to progress through the maze fast if they know where they are going, however, once or twice I overshot where I intended to stop. There is a custom maze screen, however, maze size is capped at 50 by 50, which is large but not stupidly so. Music and bloom were two suggestions I could not add, if I had more time I could have probably included the latter but I have little idea to how I could have implemented the former.
+
+\section{What have I learnt?/What could I do better next time?}
+During this project I have learnt a lot, specifically when it comes to rendering. While I was already interested in maze generation before the NEA, I had never done anything with rendering before. Even though my renderer doesn't iimplement many of the things I came across after the research stage (though it does do what it was made for), I still have that knowledge for projects I attempt in the future. Another thing I intend to do in future projects is more code upkeep, while ultimately I feel the technical solution is mostly fine when it comes to code upkeep, there could still be some obvious improvments made to the clarity of the current code. As discussed in both the "Gameplay Mechanics" and "Is the feedback from potential users met?" I would also have liked to add more gameplay features, with a timer being the first one of them I would implement. 
+
 \section{Conclusion}
-In conclusion, I believe that my project fufills all of the objectives I laid out in my analysis section and the project is functional, however, there are still quite a few improvments that could be
-made. The most pressing issue is the dependency on external libraries that aren't bundled with python, after that I would have focused on the extra gameplay features. 
+In conclusion, I believe my project fufills all of my originally outlined objectives and it is fully functional, however, there are certainly quite a few improvments that could be made. As specified in the "Performative Maze Rendering" section the part of the program I would fix first is the dependency on outside packages and then I would likey implement a timer alongside maze weaving. Overall however, I believe this project has gone well.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\clearpage
-%\part{Code Highlights}
-%\clearpage
+\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
-\part{Code breakdown by function}
+\part{Appendix}
 \section{main.py}
 This script handles the creation of the UI as well as running the Maze Database, MazeGenerationNew and 
 MazeRendererNew scripts.
@@ -481,11 +538,69 @@ def change_state(state):
     if state == "username": 
         title = tk.Label(window, text = "\n Accounts \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
         top_seperator = tk.Canvas(window, height=50,width=0).pack()
-        ...
-\end{lstlisting}
-The "change state" function takes the argument "state" and uses that to switch to a pre-defined set of UI elements, e.g. a main menu or a user select screen.
+        user_list = Db.get_list_of_users(connection)
+        for i in range(0,len(user_list)): #Loads all the current users
+            username_button = tk.Button(window,text=((user_list[i][1])[2:-1] + "\n" + "(#" + ("0" * (3-len(user_list[i][0]))) + user_list[i][0] + ")"),bg = "white",width=30,height=2)
+            username_button.config(command = lambda u = user_list[i][0]: set_user_id(u,False))
+            username_button.pack(pady=3)
+        guest_button = tk.Button(window, text = "Play as Guest",bg = "white",width=30,height=2, command = lambda u = "guest": set_user_id(u,True)).pack(pady=3)
+        create_new_button = tk.Button(window,text="+",bg = "white",width=10, command = lambda: change_state("new user")).pack(pady=3)
+        back_button = tk.Button(window, text = "Back", command = lambda: change_state("start")).pack(side="bottom",pady=10)  
+    elif state == "new user":   #New user screen
+        title = tk.Label(window, text = "\n New User \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
+        username_text = tk.Label(window, text = "Username").pack(pady=(10,1))
+        username_entry = tk.Entry(window,width=20)
+        username_entry.pack()
+        enter_button = tk.Button(window, text = "Enter",bg = "white",width=10, command = lambda u = username_entry: new_user(u)).pack(pady = 10)
+        back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)  
+    elif state == "maze select":    #Maze type select screen. Options are, Normal, Diamond and Custom
+        if user_id != 0:
+            completed = Db.get_list_of_completed_levels(connection,user_id)
+        else:
+            completed = [[],[]]
+        title = tk.Label(window, text = "\n Maze Select \n", bg = "white",  borderwidth=1, relief="groove").pack(fill = "x",pady=(20,100))
+        normal_maze_button = tk.Button(window, text = "\n  Normal-Style Maze  \n",bg = "white",relief = 'groove',width=30, command = lambda: create_levels(1,32,4,"Normal Maze","normal",completed)).pack(pady=(50,10))
+        circular_maze_button = tk.Button(window, text = "\n Diamond Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: create_levels(1,32,4,"Diamond Maze","diamond",completed)).pack(pady=10)
+        custom_maze_button = tk.Button(window, text = "\n Custom Maze \n",bg = "white",relief = 'groove',width=30,command = lambda: change_state("custom maze")).pack(pady=10)
+        reset_button = tk.Button(window, text = "Reset Progress",width=30, bg = "white",relief="groove",fg="red", command =  lambda: reset_progress()).pack(pady=50)        
+        back_button = tk.Button(window, text = "Back", command = lambda: change_state("username")).pack(side="bottom",pady=10)      
+    elif state == "custom maze":    #Custom maze creation screen
+        first = tk.Frame(window)
+        title_ = tk.Label(window, text = ("\n Custom Maze \n"), bg = "white", borderwidth = 1, relief = "groove").pack(fill = "x",pady=20)
+        top_seperator = tk.Canvas(window, height=50,width=0).pack()
+        #GENERATION
+        generation_frame = tk.Frame(window,width=10,height=10)
+        generation_frame.pack(side="left", anchor='n',padx=50)
+        title_ = tk.Label(generation_frame, text = ("\n Generation \n"), bg = "white", borderwidth = 1,width = 100, relief = "groove").pack(pady=20)
+        #Maze Type 
+        maze_type_text = tk.Label(generation_frame, text = "Type").pack(padx=4,pady=(10,0))
+        variable = tk.StringVar(generation_frame)
+        variable.set("normal")
+        maze_type_menu = tk.OptionMenu(generation_frame, variable, "normal","diamond")
+        maze_type_menu.pack(pady=(0,10))
+        #Width
+        width_text = tk.Label(generation_frame, text = "Width").pack(padx=4)
+        width_scale = tk.Scale(generation_frame, tickinterval=2, length=600, orient="horizontal",from_ = 2,to=50)
+        width_scale.pack()
+        #Height
+        height_text = tk.Label(generation_frame, text = "Height").pack(padx=4)
+        height_scale = tk.Scale(generation_frame, tickinterval=2, length=600, orient="horizontal",from_ = 2,to=50)
+        height_scale.pack()
+        #RENDERING
+        render_frame = tk.Frame(window,width=10,height=10)
+        render_frame.pack(side="right", anchor='n',padx=50)
+        title_ = tk.Label(render_frame, text = ("\n Rendering \n"), bg = "white", borderwidth = 1,width = 100, relief = "groove").pack(pady=(20,5))
+        #Cube Size
+        cs_text = tk.Label(render_frame, text = "Cell Size").pack(padx=4,pady=(10,0))
+        cs_entry = tk.Entry(render_frame, width=20)
+        cs_entry.insert("end", '10')
+        cs_entry.pack()
+              
+        generate_maze = tk.Button(window, text = "Generate",relief = 'groove', bg="white", command = lambda mt = variable, w = width_scale, h = height_scale, c = cs_entry: custom_maze(mt,h,w,c,"CUSTOM MAZE"))
+        generate_maze.pack(pady=400)
+        back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
-\begin{lstlisting}
+
 def create_levels(lower,upper,number_of_columns,title,maze_type,completed):
     des()
     first = tk.Frame(window)
@@ -516,13 +631,6 @@ def create_levels(lower,upper,number_of_columns,title,maze_type,completed):
                 side = middle
     back_button = tk.Button(window, text = "Back", command = lambda: change_state("maze select")).pack(side="bottom",pady=10)
 
-\end{lstlisting}
-"Create levels" generates a set of buttons with numbers on them, defined by the range entered in the parameters (lower and upper). If the level has already been completed by the user then the text will be green! It lays them out based on the parameter "number\_of\_columns".
-When the user clicks on one of these buttons the actual button is passed to the function so that the text on the button can be properly read.
-
-\clearpage
-
-\begin{lstlisting}
 def load_maze(lower,upper,title,maze_type,btn):   #Generates the maze and then passes the data along with other parameters to the MazeRenderer script
     maze_size = int((btn['text']).replace("\n(Complete)","")) + 3
     if installed:        
@@ -544,11 +652,6 @@ def load_maze(lower,upper,title,maze_type,btn):   #Generates the maze and then p
     completed = Db.get_list_of_completed_levels(connection,user_id)
     create_levels(lower,upper,4,title,maze_type,completed)
 
-\end{lstlisting}
-The main job of "Load Maze" is to translate the parameters entered pass them to the MazeGenerationNew, script take the generated
-data and then pass that, along with other translated parameters, to the MazeRenderNew script.
-
-\begin{lstlisting}
 def custom_maze(maze_type,width,height,cube_size,title):    #Same as the function above but for custom mazes
         width = int(width.get())
         height = int(height.get())
@@ -558,10 +661,6 @@ def custom_maze(maze_type,width,height,cube_size,title):    #Same as the functio
         play_maze(dimensions[0],dimensions[1],(str(width) + " x " + str(height)),cube_size,[len(maze_data[0])-1],[0],[0,len(maze_data)-1],maze_data)
         change_state('custom maze',True)
 
-\end{lstlisting}
-"Custom Maze" is a version of "Load Maze" for cutom mazes with unsual heights and widths. An improvement to the code would be combining the two above functions.
-
-\begin{lstlisting}
 def set_user_id(username,guest):    #Sets the user ID
     global user_id
     if guest:
@@ -570,46 +669,28 @@ def set_user_id(username,guest):    #Sets the user ID
         user_id = username
     change_state("maze select")
 
-\end{lstlisting}
-"Set User ID" is a simple function that sets the global user\_id. The user\_id is used to retrieve data about the user from maze.db, if the user is a guest then the ID is set to 0
-and all code involving the user\_id is skipped.
-
-\begin{lstlisting}
 def reset_progress():           #Resets the current users progress
     username = Db.delete_user(connection, user_id)
     Db.create_new_user(connection, username)
     change_state("maze select")
-\end{lstlisting}
-This functions is also simple. It resets the progress of the user by deleting the user from the and then creating them again, utilizing the below function.
 
-\begin{lstlisting}
 def new_user(user_entry_widget):    #Creates a new user named using the entered user name
     name = user_entry_widget.get()
     Db.create_new_user(connection,name)
     change_state("username")
-\end{lstlisting}
-Simply, adds a new entry to the database containing a new user.
 
-\clearpage
-
-\begin{lstlisting}
 def des(): #Deletes all current widgets in "window"
     widget_list = all_children(window)
     for item in widget_list:
         item.pack_forget()
-\end{lstlisting}
-This function deletes all current widgets, this is used to reset the UI so that new UI can be made in its place. It utilizes the below function
-which creates a list of all widgets pareneted to the entered object. The object entered in the case of "des()"  is the whole tkinter window.
-\begin{lstlisting}
+
 def all_children(window): # This makes a list of all the current widgets
     list_one = window.winfo_children()
     for item in list_one:
         if item.winfo_children() :
             list_one.extend(item.winfo_children())
     return list_one
-\end{lstlisting}
 
-\begin{lstlisting}
 def alter_screen():     #Changes screen dimenions to make the rendering of the maze faster
     const = 2
     dimensions = [0,0]
@@ -617,8 +698,6 @@ def alter_screen():     #Changes screen dimenions to make the rendering of the m
     dimensions[1] = int(screen_height/const)
     return dimensions
 \end{lstlisting}
-"Alter Screen" shrinks the size of the layers (images created in the renderer) to make the creation of said layers in the rendering section of the code easier
-and less resource consuming.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -647,19 +726,12 @@ FOREIGN KEY (user_id) REFERENCES users (id)
     else:
         print("Database Connection Error")
     return connection
-\end{lstlisting}
-This function is run to intialize the database, composed of two tables, (if it's not already created) and  establish a connection to said database.
-The comment explaining the datbase is included below, along with a diagram.
-\begin{lstlisting}
+
 "DATABASES
 Users table stores name and user_id + any additional information needed
 CompletedLevels table stores the completed levels linked to the foreign key user_id and a primary key completed_id. There will be two columns, one for normal mazes, one for diamond mazes
 the completed levels will be serialized as such (1#3#4#12...) and when the string is imported it will be split into a list."
-\end{lstlisting}
-\begin{center}
-	\includegraphics[scale=0.5]{Database Diagram}
-\end{center}
-\begin{lstlisting}
+
 def create_new_user(connection, username):
     #Create the new user
     new_user_sql = "INSERT INTO users(username) VALUES(?)"
@@ -672,11 +744,7 @@ def create_new_user(connection, username):
     cursor = connection.cursor()
     cursor.execute(new_completed_levels_sql, ("","",user_id))
     connection.commit()
-\end{lstlisting}
-"Create New User" inserts a row into the \textbf{users} table containing the entered username and then makes a sister entry in \textbf{completedLevels}. It uses
-cursor.lastrowid to get the correct user id.
-\clearpage
-\begin{lstlisting}
+
 def delete_user(connection, user_id):
     sql = 'SELECT username FROM users WHERE id = ?'
     cursor = connection.cursor()
@@ -693,11 +761,7 @@ def delete_user(connection, user_id):
     cursor.execute(sql, (user_id))
     connection.commit()
     return result[0][0]
-\end{lstlisting}
-"Delete User" removes an entry from users and completedLevels based on the entered user\_id. It will also return the username from said user so that they can
-be recreated in the "Reset Progress" function.
 
-\begin{lstlisting}
 def get_list_of_users(connection):
     user_list = []
     cursor = connection.cursor()
@@ -706,11 +770,7 @@ def get_list_of_users(connection):
     for row in result:
         user_list.append((str(row)[1:-1]).split(','))
     return user_list
-\end{lstlisting}
-This function is implemented in "Change State" and is used when creating the buttons for the users in the user select screen. Contained within each
-entry in the list is both the user\_id and the username.
 
-\begin{lstlisting}
 def add_completed_level(connection, level_number, maze_type, user_id):    #Uses the user id to alter the user's completed levels
     completed = get_list_of_completed_levels(connection, user_id)
     dict_one = {
@@ -728,25 +788,14 @@ def add_completed_level(connection, level_number, maze_type, user_id):    #Uses 
         sql = "UPDATE completedLevels SET diamond_maze = ? WHERE user_id = ?"
     cursor = connection.cursor()
     cursor.execute(sql,(formatted,user_id))
-\end{lstlisting}
-"Add Completed Level" takes the current completed levels list converts it to a string,  adds the entered level to the string and then inserts
-it into the correct entry in the database. It finds the correct entry based off the maze type and user\_id.
-\begin{lstlisting}
-\end{lstlisting}
-The below function is implemented in "Add Completed Level" to get the current completed levels for both maze types.
-\begin{lstlisting}
+
 def get_list_of_completed_levels(connection, user_id):
     maze_find_sql = "SELECT normal_maze, diamond_maze FROM completedLevels WHERE user_id = ?"
     cursor = connection.cursor()
     cursor.execute(maze_find_sql,(user_id))
     result = cursor.fetchall()
     return [(result[0][0]).split('#'),(result[0][1]).split('#')]
-\end{lstlisting}
-"Get List of Completed Levels" takes the string stored in the database for all maze types and converts them into a 2D array. 
-The format for the string is explained in the comment explaning the database above.
 
-\clearpage
-\begin{lstlisting}
 def create_connection(db_file):
     connection = None
     try:
@@ -754,9 +803,7 @@ def create_connection(db_file):
     except Error as e:
         print(e)
     return connection
-\end{lstlisting}
 
-\begin{lstlisting}
 def create_table(connection, create_table):
     try:
         cursor = connection.cursor()
@@ -764,9 +811,7 @@ def create_table(connection, create_table):
     except Error as e:
         print(e)
 \end{lstlisting}
-The above two functions are standard functions for interacting with a database. "Create Conncetion" creates a connection with a database file or creates the
-database file and the establishes a connection with it if it doesn't already exist. The connection is then used the interact with the database itself. "Create Table"
-actually would execute any SQL passed to it and acts more like an alias/simplification, however, it is only ever used to create tables.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -784,17 +829,7 @@ def intialize_array(width,height):
         for y in range(0,height):
             maze_array[x].append([1,1,1,1]) #Add a blank cell with all four walls to create an array that will be altered to generate a maze, this array is the data we return
     return maze_array
-\end{lstlisting}
-"Intialize Array" creates a 2D array formatted in the correct manner to be used as the \textbf{maze\_array} which represents the maze. This maze is made
-up of cells, each cell being linked to a coordinate/index in the 2D array, with the cell being represented as a list of length four (i.e. [1,1,1,1]). Each number in
-this list can be eithier a 1 or 0, representing a wall or empty space respectively. A diagram displaying this is placed below.
-\begin{center}
-	\fbox{\includegraphics[scale=0.5]{Maze Cell Diagram}}
 
-	\color{mygrey}(The numbers on the Visual Representation correlate to the index in the array)
-\end{center}
-
-\begin{lstlisting}
 def generate_random_walls(height,width):    #Random walls for testing maze renderer
     #Intialize the array
     maze_array = []
@@ -804,11 +839,7 @@ def generate_random_walls(height,width):    #Random walls for testing maze rende
         for y in range(0,height):
             maze_array[x].append([random.choice(temp_list),random.choice(temp_list),random.choice(temp_list),random.choice(temp_list)])
     return maze_array
-\end{lstlisting}
-The above function is used only in testing, it can technically generate unbeatable mazes but due to the weighted chance to generate an empty or 
-a wall (represented using temp\_list) it is unlikley. It  was mainly used in rendering testing but was also used when testing maze collision. 
-\clearpage
-\begin{lstlisting}
+
 def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based loosely on the algorithim as described in "Mazes for Programmers"
     maze_array = intialize_array(width,height)
     group_designation = 1                                                                                                                                           
@@ -859,14 +890,7 @@ def kruskals_algorithim(weight_group_array,width,height,max_weight): #Based loos
                         (weight_group_array[pos[0]][pos[1]])[4] = group_designation
                         group_designation += 1
     return maze_array
-\end{lstlisting}
-"Kruskals Algorithim" is the algorithim used to actually generate the mazes. It does this utilizing a \textbf{weight\_group\_array} and by altering
-the corridors between cells in the \textbf{maze\_array}. The outline of how it works is this; All cells have a group, at the start this is the default group (i.e. zero).
-Any cell within a group is reachable by any other cell in a group (unless it is the default group), they are essentially perfect mazes within the larger maze.
-At the start of each iteration of the while loop the code finds corridors (connections between cells) based on the lowest weight, this is done using the afformentioned
-\textbf{weight\_group\_array} and the function below.
-\clearpage
-\begin{lstlisting}
+
 def lowest_values_pos(wg_array,width,height,compared_to):   #Finds all the connections in the maze with the lowest weight value
     temp_list = []
     for x in range(0,width):
@@ -879,13 +903,7 @@ def lowest_values_pos(wg_array,width,height,compared_to):   #Finds all the conne
                 elif wg_array[x][y][i] == compared_to:
                     temp_list.append([x,y,i])
     return temp_list
-\end{lstlisting}
-The actual \textbf{weight\_group\_array} or\textbf{wg\_array}  is generated by functions "Generate Walled Maze" and "Generate Diamond Maze" discussed lower down.
-Once a corridor is chosen an actual connection is attempted, a connection will only not be made if, 1. The connection is being made to an area outside the maze or 2. The
-connection is being made to a cell that is already in the same group as the chosen cell. The latter of the two fail states exists so that the generation doesn't remove every single wall.
-If a connection is made between two cells with non-default but different groups then all cells in the group that doesn't contain the chosen cell are changed to be in the group
-with the chosen cell. This process is done using "Get All In Group" (shown below).
-\begin{lstlisting}
+
 def get_all_in_group(wg_array,width,height,group):  #Gets the positions of all the cells that have the group specified
     temp_array = []
     for x in range(0,width):
@@ -893,10 +911,7 @@ def get_all_in_group(wg_array,width,height,group):  #Gets the positions of all t
             if (wg_array[x][y])[4] == group:
                 temp_array.append([x,y])
     return temp_array
-\end{lstlisting}
-The algorithim will run untill all cells are in the same group (and that group is not the default) meaning any cell within the maze can be reached from any other cell. To check
-that all cells are in the same group the function "All In One Group" is used.
-\begin{lstlisting}
+
 def all_in_one_group(wg_array,height,width):    #Checks to see if every cell is in a singular group (a.k.a every cell can be reached from any other cell)
     returned = True
     first_group = "null"
@@ -908,8 +923,7 @@ def all_in_one_group(wg_array,height,width):    #Checks to see if every cell is 
             if temp != first_group or temp == 0:
                 returned = False                
     return returned
-\end{lstlisting}
-\begin{lstlisting}
+
 def generate_walled_maze(width,height,max_weight):
     weight_group_array = []                 
     for x in range(0,width):
@@ -918,10 +932,7 @@ def generate_walled_maze(width,height,max_weight):
             weight_group_array[x].append([random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),random.randint(1,max_weight),0])   #Create a "sister" array that stores the weight values and group of each cell
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)    #Use the weight array to generate an actual maze
     return maze_array
-\end{lstlisting}
-"Generate Walled Maze" generates a simple \textbf{weight\_group\_array} by randomly generating weight values for each cell.
-\clearpage
-\begin{lstlisting}
+
 def generate_diamond_maze(width,height,max_weight):
     weight_group_array = []
     for x in range(0,width):
@@ -967,9 +978,6 @@ def generate_diamond_maze(width,height,max_weight):
     maze_array = kruskals_algorithim(weight_group_array,width,height,max_weight)
     return maze_array 
 \end{lstlisting}
-"Generate Diamond Maze" is a more complicated  \textbf{weight\_group\_array} generator used to create a maze with an actual texture. It does this by
-circling from cells from the maze center changing the weights so that the corridors are created in a certain way leading to a pyramid/diamond pattern. This method
-could also be used to create a circular maze, however, that type of maze is significatly less fun to play. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -992,12 +1000,7 @@ class Window():
         self.screen = create_canvas(self.window)
         self.layers = []
         self.layers.append(self.Layer(self,self.height,self.width,self.default_colour)) #Create the background layer
-\end{lstlisting}
-Above is the "Window" class and its "\_\_init\_\_" function. A "Window" instance has a tkinter window (with a canvas called .screen) upon which
-layers can be placed. In the "\_\_init\_\_" function only a background/default layer is created. Each layer is also an instance of
-a class called "Layer", which is a sub-class of "Window". However, it being a sub-class doesn't actually mean anything (other than making it easier to
-understand what "Layer" is meant for) so .layers is needed in "Window" to store that given window's layers. The code for "Layer" is shown below:
-\begin{lstlisting}
+
     class Layer():  #Layer Objects
 
         def __init__(self,window,height,width,default_colour):
@@ -1008,10 +1011,7 @@ understand what "Layer" is meant for) so .layers is needed in "Window" to store 
             self.array = create_image_array(height,width,default_colour)
             self.generated_image = ImageTk.PhotoImage(master = window.screen,image=Image.fromarray(self.array))
             self.image = window.screen.create_image(width,height,image=self.generated_image)
-\end{lstlisting}
-Layers are used as a form of optimisation so that when we update the screen, to move the player for example, we only need
-to update a very small image rather than the whole maze image. 
-\begin{lstlisting}
+
     def move_layer(self,new_coords,layer_num = 0):  #Moves a layer to a given position
         #Get Current Top Left of layer Coords
         old_coords = self.screen.coords(self.layers[layer_num].image)
@@ -1019,23 +1019,14 @@ to update a very small image rather than the whole maze image.
         old_coords[1] = old_coords[1] - (self.layers[layer_num].width/2)
         #Move to new position
         self.screen.move(self.layers[layer_num].image,new_coords[0] - old_coords[0],new_coords[1] - old_coords[1])
-\end{lstlisting}
-"Move Layer" is moves any given layer to entered coordinates. While there is a standard move function for image objects on
-tkinter canvases, it moves objects by a 2D Vector rather than being coordinate based.
-\begin{lstlisting}
+
     def delete_layer(self,layer):
         self.screen.delete(self.layers[layer].image)
         self.layers.pop(layer) 
-\end{lstlisting}
-"Delete Layer" deletes a layer by first removing its image from the canvas and then poping it from the .layers list. Unlike other functions
-that interact with layers this one requires a layer number to be entered (whereas others have a default of the background layer) so that
-the background layer isn't deleted by mistake. 
-\begin{lstlisting}
+
     def reset(self, layer_num = 0):    #Resets the entered layer, used so the line below doesn't need to be typed everytime
         self.layers[layer_num].array = create_image_array(self.layers[layer_num].height,self.layers[layer_num].width,self.layers[layer_num].default_colour)
-\end{lstlisting}
-There is also "Reset" which will just reset a layer (based of the "Window" object .default\_colour) rather than deleting it.
-\begin{lstlisting}
+
     def set_pixel(self, coords, colour, layer_num=0): #Change a pixel in the image array
         coords[0] = (coords[0] * self.pixel_scale) - (self.pixel_scale - 1)
         coords[1] = (coords[1] * self.pixel_scale) - (self.pixel_scale - 1)
@@ -1045,12 +1036,7 @@ There is also "Reset" which will just reset a layer (based of the "Window" objec
                     self.layers[layer_num].array[y,x] = colour
                 except IndexError:
                     pass   
-\end{lstlisting}
-"Set Pixel" allows any pixel on the entered layer to be altered based off the coordinates entered, a range of pixels can also be affected 
-if the pixel scale isn't one. It does this by altering the coresponding index in a numpy array, this numpy array is then converted into an
-image using Pillow (PIL) and then subsequently turned into an image tkinter will accept, also using PIL. The image conversion is all done
-in the "Update" function, alongside updating the tkinter window itself.
-\begin{lstlisting}
+
     def update(self, layer_num = 0):   #Updates an entered layer
         try:
             self.layers[layer_num].generated_image = ImageTk.PhotoImage(master = self.screen,image=Image.fromarray(self.layers[layer_num].array)) #Generate a updated image from the image array
@@ -1058,8 +1044,7 @@ in the "Update" function, alongside updating the tkinter window itself.
         except IndexError:
             print("Invalid Layer")
         self.window.update()
-\end{lstlisting}
-\begin{lstlisting}
+
     def init_input(self):                   #Input created using tkinter, last key pressed = key pressed that frame
         def on_key_press(event):
             self.last_key_pressed = event.char
@@ -1069,11 +1054,7 @@ in the "Update" function, alongside updating the tkinter window itself.
             self.last_key_pressed = None
         self.window.bind('<KeyPress>', on_key_press)
         self.window.bind('<KeyRelease>', on_key_up)
-\end{lstlisting}
-The "Window" class also handles input, utilizing tkinter's event system. "Init Input" must be run to start input and within the function two other
-functions are also defined. "On Key Press" sets .last\_key\_pressed to the current key being pressed when a key is being pressed (as indicated by tkinter), while
-"On Key Up" sets .last\_key\_pressed back to \textcolor{amber}{None}. 
-\begin{lstlisting}
+
     def set_fullscreen(self, boolean):  #Turns fullscreen on and off based on boolean
         self.window.overrideredirect(True)
         self.window.overrideredirect(False)
@@ -1088,36 +1069,25 @@ functions are also defined. "On Key Press" sets .last\_key\_pressed to the curre
             self.reset(i)
         self.window.destroy()
         del self
-\end{lstlisting}
-"Set Fullscreen", "Set Pixel Scale" and "Quit" are the three functions in the "Window" class that don't directly interact with a certain layer. "Set Fullscreen" allows for fullscreen
-to be toggled on and off based on the parameter "boolean", "Set Pixel Scale" allows for the pixel scale to be changed in a less akward manner and "Quit" simply deletes every layer,
-destroys the tkinter window and then does the same to the instance of the class.
 
-\begin{lstlisting}
 def create_tkinter_window(height, width, title):    #Creates a tkinter window
     window = tk.Tk()
     window.title(title)
     window.geometry(str(width) + "x" + str(height))
     #window.overrideredirect(1) #Removes the Titlebar
     return window
-\end{lstlisting}
-"Create Tkinter Window" and the two other final functions in "Window.py" aren't directly related to the "Window" class but are used within it. "Create Tkinter Window" simply creates
-a tkinter window based of the parameters entered and then returns said window.
-\begin{lstlisting}
+
 def create_canvas(tkinter_window):  #Creates a tkinter canvas
     canvas = tk.Canvas(tkinter_window, bg="black")
     canvas.pack(fill="both",expand=True)
     return canvas
-\end{lstlisting}
-"Create Canvas" adds a canvas object to the passed tkinter window, the canvas is then made to fill the entire window. The canvas object it also returned.
-\begin{lstlisting}
+
 def create_image_array(height,width,colour): #Creates the intial image array
     image_array = np.zeros([height+1,width+1,3],dtype=np.uint8)
     image_array.fill(colour)
     return image_array
 \end{lstlisting}
-"Create Image Array" makes a numpy array and then fills it with the desired greyscale colour, entered as any value between 0 and 255, finnally the new image
-array is returned.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
@@ -1125,10 +1095,11 @@ array is returned.
 Used when actually playing a maze, mainly used to implement the Window.py script to correctly draw the maze but also handles collision detection and a check to see if the player has won.
 
 \textcolor[RGB]{220,220,220}{\rule{\linewidth}{0.2pt}}
+\\
 \begin{lstlisting}
 \end{lstlisting}
-"Play Maze" is the longest function in my entire NEA totaling around 130 lines of code, hence I'll explain it section by section rather than all at once.
 \begin{lstlisting}
+#GAME LOGIC
 def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_data):
     #A cube_size of two and below will cause the squares to be too small to be properly represented properly on any pixelated screen, hence, 3 is the lowest the function allows
     if cube_size < 3: cube_size = 3 
@@ -1154,11 +1125,256 @@ def play_maze(width,height,title,cube_size,win_pos_x,win_pos_y,start_pos,maze_da
     ending = True
     drawing_per_frame = False
     input_confirmed = False
-    input_delay = 0
+    input_delay = 0    
+    while running:
+        #Anything in this loop is run every frame
+        start_time = time.time() #For measuring execution time, it is used for debug, testing program speed and the calculation of delta_time        
+        #Input
+        if input_delay <= 0:
+            if screen.last_key_pressed != None and input_confirmed:
+                if screen.last_key_pressed == 'esc':
+                    running = False
+                if screen.last_key_pressed == 'a':
+                    add_to_x = -1
+                    move_dir = "left"
+                elif screen.last_key_pressed == 'd':
+                    add_to_x = 1
+                    move_dir = "right"
+                elif screen.last_key_pressed == 'w':
+                    add_to_y = -1
+                    move_dir = "up"
+                elif screen.last_key_pressed == 's':
+                    add_to_y = 1
+                    move_dir = "down"
+                else:
+                    move_dir = ""
+                #Checks to make sure player can't go outside the maze
+                if position_set_to[0] + add_to_x < 0 or position_set_to[0] + add_to_x > len(maze_data[0])-1:
+                    add_to_x = 0
+                    check_walls = False
+                if position_set_to[1] + add_to_y < 0 or position_set_to[1] + add_to_y > len(maze_data)-1:
+                    add_to_y = 0
+                    check_walls = False
+                #Checks to see if there is a wall in the players way
+                if(wall(maze_data,[position_set_to[0] + add_to_x,position_set_to[1] + add_to_y],player_pos,move_dir)) and check_walls:
+                    add_to_y = 0
+                    add_to_x = 0
+                check_walls = True
+                input_confirmed = False
+            else:
+                position_set_to = player_pos
+                add_to_y = 0
+                add_to_x = 0
+                input_confirmed = True
+                input_delay = 0.1        #The time between moves
+        else:
+            input_delay -= delta_time
+        #Game Code
+        if debug:
+            print(str(round((time.time() - start_time)*1000,1)) + "ms") #Prints execution time (per frame) to console
+            print(temp)
+        if loading:
+            if temp >= 1:
+                loading = False
+                screen.reset()
+            else:
+                if temp == 0:
+                    #Create Title
+                    text("Maze Game",10,[0,-height/4],white,screen,[width,height])
+                    time.sleep(0.1)
+                progress_bar(width/2,temp,screen,[0,height/4],[width,height])  #This is a stand-in progress bar to test how it would look, the real one's progression would be based on the maze generation progression
+                temp += 1 * delta_time                                  #currently the maze generates before the progress bar is shown and the maze is rendered after (To make it properly linked to maze generation
+        elif not loading:                                               #the progress bar would have to be called from the MazeGenerationNew script)
+            if first_frame == True:                
+                first_frame = False            
+                maze_width = (len(maze_data) * (cube_size-1))+1
+                maze_height = (len(maze_data[0]) * (cube_size-1))+1
+                if drawing_per_frame:
+                    x = 0
+                    y = 0
+                else:
+                    draw_maze([maze_height,maze_width],[width,height], cube_size,[win_pos_x,win_pos_y], screen, maze_data)
+                #Create Maze Title
+                text(title,3,[0,-((((len(maze_data) * (cube_size-1))+1)/2)+15)],white,screen,[width,height])
+                #Instantiate Player
+                player_pos = draw_player(True,cube_size,screen,player_pos,maze_width,maze_height,[width,height])  
+                position_set_to = player_pos
+            else:
+                if won(player_pos,win_pos_x,win_pos_y):#[len(maze_data[0])-1,0]):
+                    if ending:
+                        time.sleep(0.4) #Halts the game for a very short amount of time to make the transition to the end screen feel less abrupt
+                        screen.delete_layer(1) 
+                        screen.reset()                    
+                        text("Maze Completed",10,[0,0],white,screen,[width,height])
+                        text("#",5,[0,-50],white,screen,[width,height])
+                        ending = False
+                    if time_to_close < 0:
+                        to_return = True
+                        running = False
+                    else:
+                        time_to_close -= delta_time
+                else:
+                    if drawing_per_frame:
+                        draw_maze_per_cell([maze_height,maze_width], [x,y], [width,height], cube_size, [win_pos_x,win_pos_y], screen, maze_data)
+                        x += 1
+                        if x == len(maze_data[y]):
+                            x = 0
+                            y += 1
+                        if y == len(maze_data):
+                            drawing_per_frame = False                  
+                    player_pos = draw_player(False,cube_size,screen,[player_pos[0]+add_to_x,player_pos[1]+add_to_y],maze_width,maze_height,[width,height])
+                    screen.update(layer_num = 1)
+        delta_time = time.time() - start_time #delta_time is the time the program took to execute the last frame
+        try:
+            fps = 1/delta_time         
+        except:
+            fps = '#'
+    screen.quit()
+    return to_return
+        
+#CHECKS
+def won(player_pos,win_pos_x,win_pos_y): #Compares player position to entered position
+    if player_pos[0] in win_pos_x and player_pos[1] in win_pos_y:
+        return True
+    else:
+        return False
+
+def wall(maze_data,position_to_set_to,player_pos,move_dir): #Checks to see if there is a wall blocking the players way when they attempt to move
+    if move_dir == "":
+        return True
+    dict_one = {
+        "left":[0,1],
+        "right":[1,0],
+        "up":[2,3],
+        "down":[3,2]
+        }
+    if (maze_data[player_pos[1]][player_pos[0]])[(dict_one[move_dir])[0]] == 1 or (maze_data[position_to_set_to[1]][position_to_set_to[0]])[(dict_one[move_dir])[1]] == 1:
+        return True
+    else:
+        return False
+
+#RENDERING
+def draw_maze_per_cell(maze_dimensions, coords_to_draw, window_dimensions, cube_size, win_pos, screen, maze_data):  #Draw maze cell per frame
+    offsetx = coords_to_draw[0] * (cube_size-1)
+    offsety = coords_to_draw[1] * (cube_size-1)
+    draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,0,maze_data[coords_to_draw[1]][coords_to_draw[0]])
+    if won([coords_to_draw[0],coords_to_draw[1]],win_pos[0],win_pos[1]):
+        draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions,0)
+
+def draw_maze(maze_dimensions, window_dimensions, cube_size, win_pos, screen, maze_data):   #Draw maze all at once
+    offsetx = 0
+    offsety = 0
+    for y in range(0,len(maze_data)):
+        for x in range(0,len(maze_data[y])):
+            draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx),((0-maze_dimensions[1]/2)+offsety)],cube_size,cube_size,False,white,screen,window_dimensions,0,maze_data[y][x])
+            if won([x,y],win_pos[0],win_pos[1]):
+                draw_rectangle([(0-(maze_dimensions[0]/2)+offsetx+2),((0-maze_dimensions[1]/2)+offsety+2)],cube_size-4,cube_size-4,True,green,screen,window_dimensions,0)
+            offsetx += cube_size-1
+        offsety += cube_size-1
+        offsetx = 0
+    screen.update()   
+
+def draw_player(first_pos,cube_size,screen,position,maze_width,maze_height,window_dimensions): #Draws the player in the center of a square, indicated by x and y coordinates
+    player_size = (cube_size * 0.6)-1
+    if first_pos:
+        screen.layers.append(screen.Layer(screen,int(player_size),int(player_size),255))
+    #Move the layer to the correct position
+    new_pos = find_center_of_square(maze_width,maze_height,cube_size,position)
+    new_pos[0] = int(window_dimensions[0]) + new_pos[0] 
+    new_pos[1] = int(window_dimensions[1]) + new_pos[1]
+    screen.move_layer(new_pos,layer_num=1)
+    return position
+
+def progress_bar(width,progress,screen,offset,window_dimensions): #Generates a progress bar in the center of the screen, however, it's position can be shifted using the offset
+    center = [0+offset[0],0+offset[1]]
+    #Draw progress bar shell
+    draw_rectangle([int(center[0]-width/2),center[1]],width,15,False,white,screen,window_dimensions,0,1)
+    #Draw actual progress
+    draw_rectangle([int(center[0]-width/2)+2,center[1]+2],int((width-4)*progress),11,True,white,screen,window_dimensions,0)
+    screen.update()
+
+def text(text,text_size,offset,colour,screen,window_dimensions,layer_num = 0):        #Draws entered text on screen in the font defined in 'font.txt', by default it is drawn in the center, however, this can be altered by entering an offset
+    text_dict = {                                                       
+        "a":0,"A":0,"b":1,"B":1,"c":2,"C":2,"d":3,"D":3,"e":4,"E":4,
+        "f":5,"F":5,"g":6,"G":6,"h":7,"H":7,"i":8,"I":8,"j":9,"J":9,
+        "k":10,"K":10,"l":11,"L":11,"m":12,"M":12,"n":13,"N":13,"o":14,"O":14,
+        "p":15,"P":15,"q":16,"Q":16,"r":17,"R":17,"s":18,"S":18,"t":19,"T":19,
+        "u":20,"U":20,"v":21,"V":21,"w":22,"W":22,"x":23,"X":23,"y":24,"Y":24,
+        "z":25,"Z":25," ":26,"1":27,"2":28,"3":29,"4":30,"5":31,"6":32,"7":33,
+        "8":34,"9":35,"0":36,"#":37
+        }   #Maps a line in the text file to a character
+    text_list = split(text)
+    text_width = 0
+    text_height = 5 * text_size
+    offsetx = 0
+    offsety = 0
+    offset_character = 0
+    for i in text_list:
+        character_data = split_int(font[text_dict[i]])
+        text_width += (int((len(character_data)*text_size)/5) + (1*text_size))
+    for i in text_list:
+        character_data = split_int(font[text_dict[i]])
+        for y in range(0,5):
+            for x in range(0,int(len(character_data)/5)):
+                if character_data[(y*int(len(character_data)/5))+x] == 0:
+                    pass
+                else:
+                    draw_rectangle([(-text_width/2)+offsetx+offset_character+(offset[0]),(-text_height/2)+offsety+(offset[1])],text_size,text_size,True,colour,screen,window_dimensions,layer_num)
+                offsetx += text_size
+            offsety += text_size
+            offsetx = 0
+        offset_character += (text_size * (len(character_data)/5))+(1 * text_size)
+        offsety = 0
+    screen.update()
+        
+def draw_rectangle(startpos,width,height,fill,colour,screen,window_dimensions,layer_num,*args): #Draws a rectangle based around 0,0 (screen center), for best use don't redraw things that are already drawn (i.e. stagnant sprites, like the maze)
+    width = alter_to_fit_scale(width)
+    height = alter_to_fit_scale(height)
+    for i in range(0,len(startpos)):
+        startpos[i] = alter_coords_to_fit_scale(startpos[i],int((window_dimensions[i])/2))
+    if fill:
+        for x in range(startpos[0],startpos[0]+width):
+            for y in range(startpos[1],startpos[1]+height):
+                screen.set_pixel([x,y],colour)
+    if not fill:
+        list_one = []
+        if isinstance(args[0], int):
+            for i in range(0,4):
+                list_one.append(args[0])
+        else:
+            list_one = args[0]
+        for x in range(startpos[0],startpos[0]+width):
+            for y in range(startpos[1],startpos[1]+height):
+                if (x in range(startpos[0]+list_one[0],startpos[0]+width-list_one[1])) and (y in range(startpos[1]+list_one[2],startpos[1]+height-list_one[3])):
+                    pass
+                else:
+                    screen.set_pixel([x,y],colour,layer_num = layer_num)
+
+#CONVERTORS                    
+def find_center_of_square(maze_width,maze_height,cube_size,pos): #Converts x and y coords to pixel measurments so that the player can be properly positioned 
+    x = pos[0]                                                   
+    y = pos[1]
+    pos_in_pixels = [(0-(maze_height/2)+(cube_size-1)*x)+(0.2*cube_size),(0-(maze_width/2)+(cube_size-1)*y)+(0.2*cube_size)]
+    return pos_in_pixels
+
+def alter_to_fit_scale(value): #Alters any variable to fit game scale    
+    return int(value*scale)
+
+def alter_coords_to_fit_scale(value,full): #Makes coords relative to the center and fits them to game scale   
+    return int(full + (value*scale))
+
+#OTHER
+def split(word):                    #Splits a string into characters, used when drawing text
+    return [char for char in word]
+
+def split_int(word):                    #Splits a set of ints into characters
+    word = word.replace(" ","")
+    word = word.replace("\n","")
+    return [int(char) for char in word]
+
+def pythag(a,b):                #Intended to be used to help create the circle of visibilty around the player, not actually implemented
+    return ((a*a)+(b*b))**0.5
 \end{lstlisting}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \clearpage
 \section{External Libraries installation guide}
